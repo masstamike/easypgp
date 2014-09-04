@@ -246,14 +246,15 @@ int id action_bar_root 0x7f05001a
 int id action_bar_subtitle 0x7f050023
 int id action_bar_title 0x7f050022
 int id action_context_bar 0x7f05001d
-int id action_example 0x7f050041
+int id action_example 0x7f050042
 int id action_menu_divider 0x7f050016
 int id action_menu_presenter 0x7f050017
 int id action_mode_close_button 0x7f050024
-int id action_settings 0x7f050040
+int id action_settings 0x7f050041
 int id activity_chooser_view_content 0x7f050025
 int id always 0x7f05000b
 int id beginning 0x7f050011
+int id button1 0x7f050040
 int id checkbox 0x7f05002d
 int id collapseActionView 0x7f05000d
 int id container 0x7f05003d
@@ -262,6 +263,7 @@ int id dialog 0x7f05000e
 int id disableHome 0x7f050008
 int id drawer_layout 0x7f05003c
 int id dropdown 0x7f05000f
+int id editText1 0x7f05003f
 int id edit_query 0x7f050030
 int id end 0x7f050013
 int id expand_activities_button 0x7f050026
@@ -291,7 +293,6 @@ int id search_mag_icon 0x7f050035
 int id search_plate 0x7f050036
 int id search_src_text 0x7f050037
 int id search_voice_btn 0x7f05003b
-int id section_label 0x7f05003f
 int id shortcut 0x7f05002e
 int id showCustom 0x7f050007
 int id showHome 0x7f050004

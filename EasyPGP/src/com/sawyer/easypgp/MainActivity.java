@@ -1,22 +1,22 @@
 package com.sawyer.easypgp;
 
 import android.app.Activity;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
-import android.os.Bundle;
-import android.view.Gravity;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
+import android.widget.EditText;
+import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity implements
 		NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -45,6 +45,26 @@ public class MainActivity extends ActionBarActivity implements
 		// Set up the drawer.
 		mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
 				(DrawerLayout) findViewById(R.id.drawer_layout));
+	}
+	public void sendMessage(View view) {
+		try {
+			// Send an email
+			Intent emailIntent = new Intent(Intent.ACTION_SEND);
+			
+			EditText editText = (EditText) findViewById(R.id.editText1);
+			String message = editText.getText().toString();
+			emailIntent.setData(Uri.parse("mailto:"));
+			emailIntent.setType("text/plain");
+			emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{message});
+			emailIntent.putExtra(Intent.EXTRA_SUBJECT, "TESTING");
+			emailIntent.putExtra(Intent.EXTRA_TEXT, "This is a test email");
+			startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+			finish();
+			Log.i("Finished sending email...", "");
+		} catch (android.content.ActivityNotFoundException ex) {
+			Toast.makeText(MainActivity.this,
+				"There is no email client installed.", Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	@Override
