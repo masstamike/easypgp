@@ -1,13 +1,25 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
-
+import java.util.Scanner;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Store;
 
 public class GmailInbox {
+
+ public static String[] print10Messages (Message[] messages, int messageCount) {
+    String[] list = new String[10];
+    for(int i = messageCount-1, listI=0; i > messageCount-11; i--,listI++) {
+        try {
+        list[listI] = "Mail Subject:- " + messages[i].getSubject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    return list;
+ }
 
  public static void main(String[] args) {
   GmailInbox gmail = new GmailInbox();
@@ -31,15 +43,22 @@ public class GmailInbox {
 
    Message[] messages = inbox.getMessages();
    System.out.println("------------------------------");
-   for (int i = 0; i < 10; i++) {
-      System.out.println("Mail Subject:- " + messages[i].getSubject());      
+   Scanner s = new Scanner(System.in);
+   while (true) {
+       String[] list = print10Messages (messages, messageCount);
+       messageCount-=10;
+       for (int emailIndex = 0; emailIndex <10; emailIndex++) {
+           System.out.println(list[emailIndex]);
+       }
+       char input = s.next().charAt(0);
+       if(input  == 'q') {
+         inbox.close(true);
+         store.close();
+         System.exit(0);
+       }
    }
-   inbox.close(true);
-   store.close();
-
   } catch (Exception e) {
    e.printStackTrace();
   }
  }
-
 }
