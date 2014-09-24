@@ -47,7 +47,7 @@ public class MainActivity extends ActionBarActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		GmailInbox inbox = new GmailInbox(new Properties());
+		//GmailInbox inbox = new GmailInbox(new Properties());
 		
 
 		mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
@@ -59,7 +59,7 @@ public class MainActivity extends ActionBarActivity implements
 				(DrawerLayout) findViewById(R.id.drawer_layout));
 		
 	// Get the reference of ListViewAnimals
-      ListView animalList=(ListView)findViewById(R.id.listViewEmails);
+      /*ListView animalList=(ListView)findViewById(R.id.listViewEmails);
      
      
        final String[] emailList = inbox.print10Messages(inbox.messages, inbox.messageCount);
@@ -101,7 +101,7 @@ public class MainActivity extends ActionBarActivity implements
          Toast.makeText(MainActivity.this,
                "There is no email client installed.", Toast.LENGTH_SHORT)
                .show();
-      }
+      }*/
    }
 
    @Override
