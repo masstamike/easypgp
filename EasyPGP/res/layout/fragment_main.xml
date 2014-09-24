@@ -9,7 +9,7 @@
     tools:context="com.sawyer.easypgp.MainActivity$PlaceholderFragment" >
 
       
-        <EditText
+         <EditText
             android:id="@+id/editText1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -25,5 +25,15 @@
             android:layout_below="@+id/editText1"
             android:onClick="sendMessage"
             android:text="Send" />
+        
+        <ListView
+            android:id="@+id/listViewEmails"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/button1"
+            android:divider="#0000CC"
+            android:dividerHeight="0.1dp" >
+
+    </ListView>
 
 </RelativeLayout>
