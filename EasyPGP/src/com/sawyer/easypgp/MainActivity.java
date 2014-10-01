@@ -1,7 +1,11 @@
 package com.sawyer.easypgp;
 
-import java.util.ArrayList;
-import java.util.Properties;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -18,14 +22,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
-
-import com.sawyer.mail.utils.GmailInbox;
 
 public class MainActivity extends ActionBarActivity implements
       NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -43,44 +41,21 @@ public class MainActivity extends ActionBarActivity implements
    private CharSequence mTitle;
 
    @Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		
-		//GmailInbox inbox = new GmailInbox(new Properties());
-		
+   protected void onCreate(Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
+      setContentView(R.layout.activity_main);
 
-		mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
-				.findFragmentById(R.id.navigation_drawer);
-		mTitle = getTitle();
+      // GmailInbox inbox = new GmailInbox(new Properties());
 
-		// Set up the drawer.
-		mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
-				(DrawerLayout) findViewById(R.id.drawer_layout));
-		
-	// Get the reference of ListViewAnimals
-      /*ListView animalList=(ListView)findViewById(R.id.listViewEmails);
-     
-     
-       final String[] emailList = inbox.print10Messages(inbox.messages, inbox.messageCount);
-       // Create The Adapter with passing ArrayList as 3rd parameter
-       ArrayAdapter<String> arrayAdapter =     
-       new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, emailList);
-       // Set The Adapter
-       animalList.setAdapter(arrayAdapter);
-      
-       // register onClickListener to handle click events on each item
-       animalList.setOnItemClickListener(new OnItemClickListener()
-          {
-                   // argument position gives the index of item which is clicked
-                  public void onItemClick(AdapterView<?> arg0, View v,int position, long arg3)
-                  {
-                     
-                          String selectedEmail=emailList[position];
-                          Toast.makeText(getApplicationContext(), "Animal Selected : "+selectedEmail,   Toast.LENGTH_LONG).show();
-                       }
-          });
-	}
+      mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
+            .findFragmentById(R.id.navigation_drawer);
+      mTitle = getTitle();
+
+      // Set up the drawer.
+      mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
+            (DrawerLayout) findViewById(R.id.drawer_layout));
+
+   }
 
    public void sendMessage(View view) {
       try {
@@ -88,20 +63,48 @@ public class MainActivity extends ActionBarActivity implements
          Intent emailIntent = new Intent(Intent.ACTION_SEND);
 
          EditText editText = (EditText) findViewById(R.id.editText1);
+         EditText subjectText = (EditText) findViewById(R.id.editText2);
+         EditText contentText = (EditText) findViewById(R.id.editText3);
+         
+         // Encrypt the contents of email
+         String[] contentEncrypted = null;
+         EncryptEmail encrypt = new EncryptEmail();
+         
+         try {
+            contentEncrypted = encrypt.Encrypt(contentText.getText().toString());
+         } catch (InvalidKeyException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         } catch (NoSuchAlgorithmException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         } catch (NoSuchPaddingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         } catch (IllegalBlockSizeException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         } catch (BadPaddingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+         
          String message = editText.getText().toString();
          emailIntent.setData(Uri.parse("mailto:"));
          emailIntent.setType("text/plain");
          emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] { message });
          emailIntent.putExtra(Intent.EXTRA_SUBJECT, "TESTING");
-         emailIntent.putExtra(Intent.EXTRA_TEXT, "This is a test email");
-         startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+         emailIntent.putExtra(Intent.EXTRA_TEXT, subjectText.getText()
+               .toString());
+         startActivity(Intent.createChooser(emailIntent, contentEncrypted[0] +
+               "\nKey: " + contentEncrypted[1]));
          finish();
          Log.i("Finished sending email...", "");
       } catch (android.content.ActivityNotFoundException ex) {
          Toast.makeText(MainActivity.this,
                "There is no email client installed.", Toast.LENGTH_SHORT)
                .show();
-      }*/
+      }
    }
 
    @Override

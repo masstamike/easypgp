@@ -8,32 +8,46 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.sawyer.easypgp.MainActivity$PlaceholderFragment" >
 
-      
-         <EditText
-            android:id="@+id/editText1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="To"
-            android:inputType="textPersonName" />
+    <EditText
+        android:id="@+id/editText1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="To"
+        android:inputType="textEmailAddress" />
 
-        <Button
-            android:id="@+id/button1"
-            android:layout_width="96dp"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/editText1"
-            android:layout_below="@+id/editText1"
-            android:onClick="sendMessage"
-            android:text="Send" />
-        
-        <ListView
-            android:id="@+id/listViewEmails"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_below="@+id/button1"
-            android:divider="#0000CC"
-            android:dividerHeight="0.1dp" >
+    <EditText
+        android:id="@+id/editText2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/editText1"
+        android:layout_below="@+id/editText1"
+        android:ems="10"
+        android:hint="Subject"
+        android:inputType="textEmailSubject" >
 
-    </ListView>
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/editText3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/editText2"
+        android:layout_alignRight="@+id/editText2"
+        android:layout_below="@+id/editText2"
+        android:ems="10"
+        android:inputType="textMultiLine" />
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/editText2"
+        android:layout_marginBottom="21dp"
+        android:onClick="sendMessage"
+        android:text="Send" />
 
 </RelativeLayout>
