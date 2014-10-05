@@ -122,8 +122,8 @@ public class MainActivity extends ActionBarActivity implements
                Base64.DEFAULT);
          emailIntent.setData(Uri.parse("mailto:"));
          emailIntent.setType("text/plain");
-         emailIntent.putExtra(Intent.EXTRA_EMAIL,
-               new String[] { recipientText.getText().toString() });
+         emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] { recipientText
+               .getText().toString() });
          emailIntent.putExtra(Intent.EXTRA_SUBJECT, subjectText.getText()
                .toString());
          // Log.d("com.sawyer.easypgp",contentEncrypted[0].toString());
@@ -190,6 +190,9 @@ public class MainActivity extends ActionBarActivity implements
       int id = item.getItemId();
       if (id == R.id.action_settings) {
          return true;
+      }
+      else if (id == R.id.action_example) {
+         sendMessage(findViewById(R.layout.activity_main));
       }
       return super.onOptionsItemSelected(item);
    }

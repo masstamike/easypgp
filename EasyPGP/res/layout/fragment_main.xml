@@ -35,21 +35,13 @@
         android:layout_alignRight="@+id/editText2"
         android:layout_below="@+id/editText2"
         android:ems="10"
+        android:hint="Body"
         android:inputType="textMultiLine" />
-    <TextView 
+
+    <TextView
         android:id="@+id/tvOutput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/textToEncrypt"/>
-
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="96dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/editText2"
-        android:layout_marginBottom="21dp"
-        android:onClick="sendMessage"
-        android:text="Send" />
+        android:layout_below="@id/textToEncrypt" />
 
 </RelativeLayout>

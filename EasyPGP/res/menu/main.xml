@@ -5,7 +5,8 @@
 
     <item
         android:id="@+id/action_example"
-        android:title="@string/action_example"
+        android:icon="@drawable/ic_gmail"
+        android:title="@string/send_message"
         app:showAsAction="withText|ifRoom"/>
     <item
         android:id="@+id/action_settings"
