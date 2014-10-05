@@ -1,9 +1,13 @@
 package com.sawyer.easypgp;
 
 import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
@@ -16,6 +20,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,6 +32,8 @@ import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity implements
       NavigationDrawerFragment.NavigationDrawerCallbacks {
+
+   static final String TAG = "AsymmetricAlgorithmRSA";
 
    /**
     * Fragment managing the behaviors, interactions and presentation of the
@@ -59,45 +66,69 @@ public class MainActivity extends ActionBarActivity implements
 
    public void sendMessage(View view) {
       try {
+         // Original text
+         EditText tvorig = (EditText) findViewById(R.id.textToEncrypt);
+         String text = tvorig.getText().toString();
+
+         // Generate key pair for 1024-bit RSA encryption and decryption
+         Key publicKey = null;
+         Key privateKey = null;
+         try {
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+            kpg.initialize(1024);
+            KeyPair kp = kpg.genKeyPair();
+            publicKey = kp.getPublic();
+            privateKey = kp.getPrivate();
+         } catch (Exception e) {
+            Log.e(TAG, "RSA key pair error");
+         }
+
+         // Encode the original data with RSA private key
+         byte[] encodedBytes = null;
+         try {
+            Cipher c = Cipher.getInstance("RSA");
+            c.init(Cipher.ENCRYPT_MODE, privateKey);
+            encodedBytes = c.doFinal(text.getBytes());
+         } catch (Exception e) {
+            Log.e(TAG, "RSA encryption error");
+         }
+         /*
+          * TextView tvencoded = (TextView) findViewById(R.id.textView2);
+          * tvencoded.setText("[ENCODED]:\n" +
+          * Base64.encodeToString(encodedBytes, Base64.DEFAULT) + "\n");
+          */
+
+         // Decode the encoded data with RSA public key
+         /*
+          * byte[] decodedBytes = null; try { Cipher c =
+          * Cipher.getInstance("RSA"); c.init(Cipher.DECRYPT_MODE, publicKey);
+          * decodedBytes = c.doFinal(encodedBytes); } catch (Exception e) {
+          * Log.e(TAG, "RSA decryption error"); } TextView tvdecoded =
+          * (TextView) findViewById(R.id.textView3);
+          * tvdecoded.setText("[DECODED]:\n" + new String(decodedBytes) +
+          * "\nPublic Key: " + Base64.encodeToString(publicKey.getEncoded(),
+          * Base64.DEFAULT) + "\nPrivate Key: " +
+          * Base64.encodeToString(privateKey.getEncoded(), Base64.DEFAULT));
+          */
+
          // Send an email
          Intent emailIntent = new Intent(Intent.ACTION_SEND);
 
-         EditText editText = (EditText) findViewById(R.id.editText1);
+         EditText recipientText = (EditText) findViewById(R.id.editText1);
          EditText subjectText = (EditText) findViewById(R.id.editText2);
-         EditText contentText = (EditText) findViewById(R.id.editText3);
-         
-         // Encrypt the contents of email
-         String[] contentEncrypted = null;
-         EncryptEmail encrypt = new EncryptEmail();
-         
-         try {
-            contentEncrypted = encrypt.Encrypt(contentText.getText().toString());
-         } catch (InvalidKeyException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-         } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-         } catch (NoSuchPaddingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-         } catch (IllegalBlockSizeException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-         } catch (BadPaddingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-         }
-         
-         String message = editText.getText().toString();
+         // EditText contentText = (EditText) findViewById(R.id.editText3);
+
+         String messageEncrypted = Base64.encodeToString(encodedBytes,
+               Base64.DEFAULT);
          emailIntent.setData(Uri.parse("mailto:"));
          emailIntent.setType("text/plain");
-         emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] { message });
-         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "TESTING");
-         emailIntent.putExtra(Intent.EXTRA_TEXT, subjectText.getText()
+         emailIntent.putExtra(Intent.EXTRA_EMAIL,
+               new String[] { recipientText.getText().toString() });
+         emailIntent.putExtra(Intent.EXTRA_SUBJECT, subjectText.getText()
                .toString());
-         startActivity(Intent.createChooser(emailIntent, contentEncrypted[0] +
-               "\nKey: " + contentEncrypted[1]));
+         // Log.d("com.sawyer.easypgp",contentEncrypted[0].toString());
+         emailIntent.putExtra(Intent.EXTRA_TEXT, messageEncrypted);
+         startActivity(Intent.createChooser(emailIntent, "Send mail..."));
          finish();
          Log.i("Finished sending email...", "");
       } catch (android.content.ActivityNotFoundException ex) {

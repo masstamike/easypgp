@@ -25,13 +25,10 @@
         android:layout_below="@+id/editText1"
         android:ems="10"
         android:hint="Subject"
-        android:inputType="textEmailSubject" >
-
-        <requestFocus />
-    </EditText>
+        android:inputType="textEmailSubject" />
 
     <EditText
-        android:id="@+id/editText3"
+        android:id="@+id/textToEncrypt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/editText2"
@@ -39,6 +36,11 @@
         android:layout_below="@+id/editText2"
         android:ems="10"
         android:inputType="textMultiLine" />
+    <TextView 
+        android:id="@+id/tvOutput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textToEncrypt"/>
 
     <Button
         android:id="@+id/button1"
