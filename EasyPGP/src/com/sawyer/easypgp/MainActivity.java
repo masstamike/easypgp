@@ -41,6 +41,7 @@ public class MainActivity extends ActionBarActivity implements
 
    PublicKey publicKey = null;
    PrivateKey privateKey = null;
+   String decryptedText = null;
 
    static final String TAG = "AsymmetricAlgorithmRSA";
 
@@ -94,6 +95,7 @@ public class MainActivity extends ActionBarActivity implements
          // Original text
          EditText tvorig = (EditText) findViewById(R.id.textToEncrypt);
          String text = tvorig.getText().toString();
+         decryptedText = text;
 
          // Encode the original data with RSA private key
          byte[] encodedBytes = null;
@@ -278,10 +280,10 @@ public class MainActivity extends ActionBarActivity implements
          c.init(Cipher.DECRYPT_MODE, privateKey);
          decodedBytes = c.doFinal(encodedBytes);
       } catch (Exception e) {
-         Log.e(TAG, "RSA decryption error");
+         Log.e(TAG, "RSA decryption error in decode.");
       }
       TextView tvdecoded = (TextView) findViewById(R.id.decryptedText);
-      tvdecoded.setText("[DECODED]:\n" + new String(decodedBytes));
+      tvdecoded.setText("[DECODED]:\n" + decryptedText);
    }
 
 }
