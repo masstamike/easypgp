@@ -1,8 +1,9 @@
 package com.sawyer.easypgp;
 
-import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 import javax.crypto.Cipher;
 
@@ -24,10 +25,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity implements
 		NavigationDrawerFragment.NavigationDrawerCallbacks {
+
+	PublicKey publicKey = null;
+	PrivateKey privateKey = null;
 
 	static final String TAG = "AsymmetricAlgorithmRSA";
 
@@ -48,7 +53,15 @@ public class MainActivity extends ActionBarActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		// GmailInbox inbox = new GmailInbox(new Properties());
+		try {
+			KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+			kpg.initialize(1024);
+			KeyPair kp = kpg.genKeyPair();
+			publicKey = kp.getPublic();
+			privateKey = kp.getPrivate();
+		} catch (Exception e) {
+			Log.e(TAG, "RSA key pair error");
+		}
 
 		mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
 				.findFragmentById(R.id.navigation_drawer);
@@ -65,16 +78,6 @@ public class MainActivity extends ActionBarActivity implements
 			// Original text
 			EditText tvorig = (EditText) findViewById(R.id.textToEncrypt);
 			String text = tvorig.getText().toString();
-
-			try {
-				KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-				kpg.initialize(1024);
-				KeyPair kp = kpg.genKeyPair();
-				publicKey = kp.getPublic();
-				privateKey = kp.getPrivate();
-			} catch (Exception e) {
-				Log.e(TAG, "RSA key pair error");
-			}
 
 			// Encode the original data with RSA private key
 			byte[] encodedBytes = null;
@@ -150,8 +153,7 @@ public class MainActivity extends ActionBarActivity implements
 		case 2:
 			mTitle = getString(R.string.title_decrypt);
 			Fragment frag = new DecodeFragment();
-			ft.replace(R.id.container, frag)
-			  .commit();
+			ft.replace(R.id.container, frag).commit();
 			break;
 		case 3:
 			mTitle = getString(R.string.title_share_key);
@@ -231,6 +233,25 @@ public class MainActivity extends ActionBarActivity implements
 			((MainActivity) activity).onSectionAttached(getArguments().getInt(
 					ARG_SECTION_NUMBER));
 		}
+	}
+
+	public void onClickDecode(View view) {
+
+		TextView encodedTV = (TextView) findViewById(R.id.decryptText);
+		byte[] encodedBytes = encodedTV.getText().toString().getBytes();
+		// Decode the encoded data with RSA public key
+		byte[] decodedBytes = null;
+		try {
+			Cipher c = Cipher.getInstance("RSA");
+			c.init(Cipher.DECRYPT_MODE, publicKey);
+			decodedBytes = c.doFinal(encodedBytes);
+		} catch (Exception e) {
+			Log.e(TAG, "RSA decryption error");
+		}
+		TextView tvdecoded = (TextView) findViewById(R.id.decryptedText);
+		tvdecoded
+				.setText("[DECODED]:\n"
+						+ new String(decodedBytes));
 	}
 
 }
