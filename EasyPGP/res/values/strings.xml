@@ -2,12 +2,14 @@
 <resources>
 
     <string name="app_name">EasyPGP</string>
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
+    <string name="title_compose">Compse</string>
+    <string name="title_decrypt">Decrypt</string>
+    <string name="title_share_key">Share Key</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="send_message">Send Message</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_decode_fragment">Decode</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>
