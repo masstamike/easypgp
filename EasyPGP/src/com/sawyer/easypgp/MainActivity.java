@@ -141,7 +141,6 @@ public class MainActivity extends ActionBarActivity implements
          // Log.d("com.sawyer.easypgp",contentEncrypted[0].toString());
          emailIntent.putExtra(Intent.EXTRA_TEXT, messageEncrypted);
          startActivity(Intent.createChooser(emailIntent, "Send mail..."));
-         finish();
          Log.i("Finished sending email...", "");
       } catch (android.content.ActivityNotFoundException ex) {
          Toast.makeText(MainActivity.this,
@@ -254,6 +253,7 @@ public class MainActivity extends ActionBarActivity implements
    public void onClickDecode(View view) {
 
       ObjectInputStream ois = null;
+      Log.d("Decrypt Button", "Decrypt Button Pressed");
 
       try {
          FileInputStream file = this.getApplicationContext().openFileInput(
