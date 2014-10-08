@@ -1,5 +1,6 @@
 package com.sawyer.easypgp;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -41,6 +42,7 @@ public class MainActivity extends ActionBarActivity implements
 
    PublicKey publicKey = null;
    PrivateKey privateKey = null;
+   Cipher c = null;
 
    static final String TAG = "AsymmetricAlgorithmRSA";
 
@@ -61,22 +63,29 @@ public class MainActivity extends ActionBarActivity implements
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_main);
       ObjectOutputStream oos = null;
-
-      try {
-         KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-         kpg.initialize(1024);
-         KeyPair kp = kpg.genKeyPair();
-         publicKey = kp.getPublic();
-         privateKey = kp.getPrivate();
-         FileOutputStream file = openFileOutput("publicKey",
-               Context.MODE_PRIVATE);
-         oos = new ObjectOutputStream(file);
-         oos.writeObject(publicKey);
-         file = openFileOutput("privateKey", Context.MODE_PRIVATE);
-         oos = new ObjectOutputStream(file);
-         oos.writeObject(privateKey);
-      } catch (Exception e) {
-         Log.e(TAG, "RSA key pair error");
+      File file = getBaseContext().getFileStreamPath("publicKey");
+      if (!file.exists()) {
+         try {
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+            kpg.initialize(1024);
+            KeyPair kp = kpg.genKeyPair();
+            publicKey = kp.getPublic();
+            privateKey = kp.getPrivate();
+            FileOutputStream filePublic = openFileOutput("publicKey",
+                  Context.MODE_PRIVATE);
+            oos = new ObjectOutputStream(filePublic);
+            oos.writeObject(publicKey);
+            FileOutputStream fileOutput = openFileOutput("privateKey", Context.MODE_PRIVATE);
+            oos = new ObjectOutputStream(fileOutput);
+            oos.writeObject(privateKey);
+            c = Cipher.getInstance("RSA");
+            c.init(Cipher.ENCRYPT_MODE, publicKey);
+            FileOutputStream fileC = openFileOutput("cipher", Context.MODE_PRIVATE);
+            oos = new ObjectOutputStream(fileC);
+            oos.writeObject(c);
+         } catch (Exception e) {
+            Log.e(TAG, "RSA key pair error");
+         }
       }
 
       mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
@@ -91,6 +100,25 @@ public class MainActivity extends ActionBarActivity implements
 
    public void sendMessage(View view) {
       try {
+         // Retrieve Key
+         ObjectInputStream ois = null;
+
+         try {
+            FileInputStream file = this.getApplicationContext().openFileInput(
+                  "publicKey");
+            ois = new ObjectInputStream(file);
+            PublicKey publicKey = (PublicKey) ois.readObject();
+            Log.d ("publicKey =", publicKey.toString());
+         } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+         } catch (StreamCorruptedException e) {
+            e.printStackTrace();
+         } catch (IOException e) {
+            e.printStackTrace();
+         } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+         }
+         
          // Original text
          EditText tvorig = (EditText) findViewById(R.id.textToEncrypt);
          String text = tvorig.getText().toString();
@@ -99,9 +127,10 @@ public class MainActivity extends ActionBarActivity implements
          byte[] encodedBytes = null;
          try {
             Cipher c = Cipher.getInstance("RSA");
-            c.init(Cipher.ENCRYPT_MODE, privateKey);
+            c.init(Cipher.ENCRYPT_MODE, publicKey);
             encodedBytes = c.doFinal(text.getBytes());
-         } catch (Exception e) {
+            Log.d("text", text);
+           } catch (Exception e) {
             Log.e(TAG, "RSA encryption error");
          }
          /*
