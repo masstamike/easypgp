@@ -22,7 +22,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/decryptText"
-        android:text="Decrypt" />
+        android:text="Decrypt"
+        android:onClick="onClickDecode" />
 
     <TextView
         android:id="@+id/decryptedText"

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
@@ -40,9 +41,6 @@ import android.widget.Toast;
 public class MainActivity extends ActionBarActivity implements
       NavigationDrawerFragment.NavigationDrawerCallbacks {
 
-   PublicKey publicKey = null;
-   PrivateKey privateKey = null;
-   Cipher c = null;
 
    static final String TAG = "AsymmetricAlgorithmRSA";
 
@@ -69,18 +67,20 @@ public class MainActivity extends ActionBarActivity implements
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
             kpg.initialize(1024);
             KeyPair kp = kpg.genKeyPair();
-            publicKey = kp.getPublic();
-            privateKey = kp.getPrivate();
+            PublicKey publicKey = kp.getPublic();
+            PrivateKey privateKey = kp.getPrivate();
             FileOutputStream filePublic = openFileOutput("publicKey",
                   Context.MODE_PRIVATE);
             oos = new ObjectOutputStream(filePublic);
             oos.writeObject(publicKey);
-            FileOutputStream fileOutput = openFileOutput("privateKey", Context.MODE_PRIVATE);
+            FileOutputStream fileOutput = openFileOutput("privateKey",
+                  Context.MODE_PRIVATE);
             oos = new ObjectOutputStream(fileOutput);
             oos.writeObject(privateKey);
-            c = Cipher.getInstance("RSA");
+            Cipher c = Cipher.getInstance("RSA");
             c.init(Cipher.ENCRYPT_MODE, publicKey);
-            FileOutputStream fileC = openFileOutput("cipher", Context.MODE_PRIVATE);
+            FileOutputStream fileC = openFileOutput("cipher",
+                  Context.MODE_PRIVATE);
             oos = new ObjectOutputStream(fileC);
             oos.writeObject(c);
          } catch (Exception e) {
@@ -102,13 +102,14 @@ public class MainActivity extends ActionBarActivity implements
       try {
          // Retrieve Key
          ObjectInputStream ois = null;
+         PublicKey publicKey = null;
 
          try {
             FileInputStream file = this.getApplicationContext().openFileInput(
                   "publicKey");
             ois = new ObjectInputStream(file);
-            PublicKey publicKey = (PublicKey) ois.readObject();
-            Log.d ("publicKey =", publicKey.toString());
+            publicKey = (PublicKey) ois.readObject();
+            Log.d("publicKey: ", publicKey.toString());
          } catch (FileNotFoundException e1) {
             e1.printStackTrace();
          } catch (StreamCorruptedException e) {
@@ -118,7 +119,7 @@ public class MainActivity extends ActionBarActivity implements
          } catch (ClassNotFoundException e) {
             e.printStackTrace();
          }
-         
+
          // Original text
          EditText tvorig = (EditText) findViewById(R.id.textToEncrypt);
          String text = tvorig.getText().toString();
@@ -130,7 +131,7 @@ public class MainActivity extends ActionBarActivity implements
             c.init(Cipher.ENCRYPT_MODE, publicKey);
             encodedBytes = c.doFinal(text.getBytes());
             Log.d("text", text);
-           } catch (Exception e) {
+         } catch (Exception e) {
             Log.e(TAG, "RSA encryption error");
          }
          /*
@@ -283,12 +284,14 @@ public class MainActivity extends ActionBarActivity implements
    public void onClickDecode(View view) {
 
       ObjectInputStream ois = null;
+      PrivateKey privateKey = null;
 
       try {
          FileInputStream file = this.getApplicationContext().openFileInput(
                "privateKey");
          ois = new ObjectInputStream(file);
-         PrivateKey privateKey = (PrivateKey) ois.readObject();
+         privateKey = (PrivateKey) ois.readObject();
+         Log.d("privateKey:", privateKey.toString());
       } catch (FileNotFoundException e1) {
          e1.printStackTrace();
       } catch (StreamCorruptedException e) {
@@ -297,15 +300,19 @@ public class MainActivity extends ActionBarActivity implements
          e.printStackTrace();
       } catch (ClassNotFoundException e) {
          e.printStackTrace();
+      } finally {
+         Log.d("Uncaught Exception", "Exception not caught.");
       }
       TextView encodedTV = (TextView) findViewById(R.id.decryptText);
-      byte[] encodedBytes = encodedTV.getText().toString().getBytes();
+      String encodedBytes = encodedTV.getText().toString();
+      Log.d("Encoded Bytes:","Encoded Bytes: "+encodedBytes);
       // Decode the encoded data with RSA public key
-      byte[] decodedBytes = null;
+      byte[] decodedBytes = {(byte) 0};
       try {
          Cipher c = Cipher.getInstance("RSA");
          c.init(Cipher.DECRYPT_MODE, privateKey);
-         decodedBytes = c.doFinal(encodedBytes);
+         decodedBytes = c.doFinal(encodedBytes.getBytes());
+         Log.d("decodedBytes","decodedBytes "+new String(decodedBytes));
       } catch (Exception e) {
          Log.e(TAG, "RSA decryption error");
       }
