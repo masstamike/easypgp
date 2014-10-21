@@ -300,21 +300,25 @@ public class MainActivity extends ActionBarActivity implements
          e.printStackTrace();
       } catch (ClassNotFoundException e) {
          e.printStackTrace();
-      } finally {
+      } catch (Exception e) {
          Log.d("Uncaught Exception", "Exception not caught.");
+         e.printStackTrace();
       }
       TextView encodedTV = (TextView) findViewById(R.id.decryptText);
       String encodedBytes = encodedTV.getText().toString();
+      byte[] messageEncrypted = Base64.decode(encodedBytes,
+              Base64.DEFAULT);
       Log.d("Encoded Bytes:","Encoded Bytes: "+encodedBytes);
       // Decode the encoded data with RSA public key
       byte[] decodedBytes = {(byte) 0};
       try {
          Cipher c = Cipher.getInstance("RSA");
          c.init(Cipher.DECRYPT_MODE, privateKey);
-         decodedBytes = c.doFinal(encodedBytes.getBytes());
+         decodedBytes = c.doFinal(messageEncrypted);
          Log.d("decodedBytes","decodedBytes "+new String(decodedBytes));
       } catch (Exception e) {
          Log.e(TAG, "RSA decryption error");
+         e.printStackTrace();
       }
       TextView tvdecoded = (TextView) findViewById(R.id.decryptedText);
       tvdecoded.setText("[DECODED]:\n" + new String(decodedBytes));
