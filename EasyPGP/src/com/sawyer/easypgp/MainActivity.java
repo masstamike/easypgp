@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
-import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
@@ -38,6 +37,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+// Todo: Move utilities to separate classes.
+// Todo: Encrypt AES key with RSA encryption, then encrypt message with AES
 public class MainActivity extends ActionBarActivity implements
       NavigationDrawerFragment.NavigationDrawerCallbacks {
 
