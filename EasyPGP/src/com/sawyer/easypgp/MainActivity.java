@@ -97,6 +97,11 @@ public class MainActivity extends ActionBarActivity implements
       mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
             (DrawerLayout) findViewById(R.id.drawer_layout));
 
+      
+      // Log Emails...
+      GmailInbox gmail = new GmailInbox();
+      gmail.read(getResources().openRawResource(R.raw.smtp_properties));
+      
    }
 
    public void sendMessage(View view) {
