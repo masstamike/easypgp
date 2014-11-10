@@ -28,21 +28,22 @@ public class GmailInbox extends Activity{
       return list;
    }
 
-   public static void main(String[] args) {
-      GmailInbox gmail = new GmailInbox();
-      //gmail.read(new FileInputStream(null));
-   }
 
    public void read(InputStream is) {
       Properties props = new Properties();
       
       try {
+    	 Log.i("Emailer", "Just started read()");
          props.load(is);
          Session session = Session.getDefaultInstance(props, null);
 
+         Log.i("Emailer", "Before store is created.");
          Store store = session.getStore("imaps");
+         Log.i("Emailer", "After store is created.");
+
          store.connect("smtp.gmail.com", "michaelsawyer92@gmail.com",
                "wogywimdjubybtnk");
+
 
          Folder inbox = store.getFolder("inbox");
          inbox.open(Folder.READ_ONLY);
@@ -50,11 +51,10 @@ public class GmailInbox extends Activity{
 
          Log.d("Emailer","Total Messages:- " + messageCount);
 
-         Message[] messages = inbox.getMessages();
+         //Message[] messages = inbox.getMessages();
+         Log.i("Emailer", "------------------------------");
          System.out.println("------------------------------");
-         Scanner s = new Scanner(System.in);
-         String[] list = print10Messages(messages, messageCount);
-         messageCount -= 10;
+         System.out.println("Total Messages:- " + messageCount);
          inbox.close(true);
          store.close();
          System.exit(0);

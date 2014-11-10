@@ -47,7 +47,6 @@ import android.widget.Toast;
 // TODO: Encrypt AES key with RSA encryption, then encrypt message with AES
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class MainActivity extends ActionBarActivity implements
-<<<<<<< HEAD
     NavigationDrawerFragment.NavigationDrawerCallbacks {
 
   static final String TAG = "AsymmetricAlgorithmRSA";
@@ -105,8 +104,11 @@ public class MainActivity extends ActionBarActivity implements
         (DrawerLayout) findViewById(R.id.drawer_layout));
 
     // Log Emails...
+    Log.i("Emails", "About to create GmailInbox");
     GmailInbox gmail = new GmailInbox();
+    Log.i("Emails", "Created GmailInbox");
     gmail.read(getResources().openRawResource(R.raw.smtp_properties));
+    Log.i("Emails", "After calling gmail.read()");
   }
   
   @Override
