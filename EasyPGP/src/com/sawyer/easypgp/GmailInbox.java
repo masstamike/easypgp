@@ -28,6 +28,10 @@ public class GmailInbox extends Activity{
       return list;
    }
 
+   public static void main(String[] args) {
+      GmailInbox gmail = new GmailInbox();
+      //gmail.read(new FileInputStream(null));
+   }
 
    public void read(InputStream is) {
       Properties props = new Properties();
