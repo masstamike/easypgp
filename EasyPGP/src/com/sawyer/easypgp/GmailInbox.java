@@ -11,8 +11,9 @@ import javax.mail.Store;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ListView;
 
-public class GmailInbox extends AsyncTask<Void, Void, String[]> {
+public class GmailInbox extends Activity AsyncTask<Void, Void, String[]> {
 
 	public static String[] print10Messages(Message[] messages, int messageCount) {
 		String[] list = new String[10];
@@ -73,5 +74,6 @@ public class GmailInbox extends AsyncTask<Void, Void, String[]> {
 	@Override
 	protected void onPostExecute(String[] result) {
 		// Update activity with emails.
+	   ListView lv = (ListView) findResourceByIt(R.id.emailList);
 	}
 }
