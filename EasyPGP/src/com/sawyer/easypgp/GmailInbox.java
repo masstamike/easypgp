@@ -1,5 +1,6 @@
 package com.sawyer.easypgp;
 
+import java.util.ArrayList;
 import java.util.Properties;
 
 import javax.mail.Folder;
@@ -12,6 +13,8 @@ import javax.mail.Store;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 public class GmailInbox extends AsyncTask<Activity, Void, String[]> {
    Activity mainActivityContext;
@@ -76,5 +79,17 @@ public class GmailInbox extends AsyncTask<Activity, Void, String[]> {
    @Override
    protected void onPostExecute(String[] result) {
       // Update activity with emails.
+	      try {
+	          ListView lv = (ListView) mainActivityContext.findViewById(R.id.emailList);
+	          ArrayList<String> list = new ArrayList<String>();
+	          for (int i = 0; i < result.length; i++)
+	             list.add(result[i]);
+	          ArrayAdapter<String> adapter = new ArrayAdapter<String>(mainActivityContext,
+	                android.R.layout.simple_list_item_1, list);
+	          lv.setAdapter(adapter);
+	       } catch (Exception e) {
+	          // TODO Auto-generated catch block
+	          e.printStackTrace();
+	       }
    }
 }

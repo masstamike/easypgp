@@ -108,9 +108,9 @@ public class MainActivity extends ActionBarActivity implements
 
       // Log Emails...
       Log.i("Emails", "About to create GmailInbox");
-      GmailInbox gmail = new GmailInbox();
+      //GmailInbox gmail = new GmailInbox();
       Log.i("Emails", "Created GmailInbox");
-      gmail.execute(this);
+      //gmail.execute(this);
       Log.i("Emails", "After calling gmail.read()");
    }
 
