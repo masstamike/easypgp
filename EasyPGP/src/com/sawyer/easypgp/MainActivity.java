@@ -212,6 +212,11 @@ public class MainActivity extends ActionBarActivity implements
       ft.replace(R.id.container, frag).commit();
       break;
     case 3:
+      mTitle = getString(R.string.title_inbox);
+      Fragment inbox_frag = new InboxFragment();
+      ft.replace(R.id.container, inbox_frag).commit();
+      break;
+    case 4:
       mTitle = getString(R.string.title_share_key);
       Fragment share_key_frag = new ShareKeyFragment();
       ft.replace(R.id.container, share_key_frag).commit();
