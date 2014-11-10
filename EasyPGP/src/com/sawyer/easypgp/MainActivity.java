@@ -107,7 +107,7 @@ public class MainActivity extends ActionBarActivity implements
     Log.i("Emails", "About to create GmailInbox");
     GmailInbox gmail = new GmailInbox();
     Log.i("Emails", "Created GmailInbox");
-    gmail.read(getResources().openRawResource(R.raw.smtp_properties));
+    gmail.execute();
     Log.i("Emails", "After calling gmail.read()");
   }
   

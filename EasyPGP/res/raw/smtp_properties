@@ -4,4 +4,4 @@ mail.smtp.socketFactory.class=javax.net.ssl.SSLSocketFactory
 mail.smtp.starttls.enable=true
 mail.smtp.auth=true
 mail.smtp.port=465
-mail.store.protocol=imaps
+mail.store.protocol=imap
