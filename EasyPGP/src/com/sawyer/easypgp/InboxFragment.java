@@ -69,7 +69,7 @@ public class InboxFragment extends Fragment {
 			String[] tenMessages = null;
 
 			try {
-				Session session = Session.getDefaultInstance(props, null);
+				Session session = Session.getInstance(props, null);
 
 				Store store = session.getStore("imaps");
 

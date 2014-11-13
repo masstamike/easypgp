@@ -13,15 +13,8 @@ import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
-import java.util.Properties;
 
 import javax.crypto.Cipher;
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.NoSuchProviderException;
-import javax.mail.Session;
-import javax.mail.Store;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -47,13 +40,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
 import com.sawyer.gmail.GmailSender;
 
@@ -186,20 +177,12 @@ public class MainActivity extends ActionBarActivity implements
 
          String messageEncrypted = Base64.encodeToString(encodedBytes,
                Base64.DEFAULT);
-         /*
-          * emailIntent.setData(Uri.parse("mailto:"));
-          * emailIntent.setType("text/plain");
-          * emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {
-          * recipientText .getText().toString() });
-          * emailIntent.putExtra(Intent.EXTRA_SUBJECT, subjectText.getText()
-          * .toString()); //
-          * Log.d("com.sawyer.easypgp",contentEncrypted[0].toString());
-          * emailIntent.putExtra(Intent.EXTRA_TEXT, messageEncrypted);
-          * startActivity(Intent.createChooser(emailIntent, "Send mail..."));
-          */
-         new SendEmail();
-         finish();
+         String recipient = recipientText.getText().toString();
+         String subject = subjectText.getText().toString();
+         String message = messageEncrypted;
+         new SendEmail(subject, message, "michaelsawyer92@gmail.com", recipient);
          Log.i("Finished sending email...", "");
+         Toast.makeText(MainActivity.this, "Email Sent!", Toast.LENGTH_SHORT).show();
       } catch (android.content.ActivityNotFoundException ex) {
          Toast.makeText(MainActivity.this,
                "There is no email client installed.", Toast.LENGTH_SHORT)
@@ -437,17 +420,23 @@ public class MainActivity extends ActionBarActivity implements
    }
    private class SendEmail extends AsyncTask<Void, Void, Void> {
       
-      public SendEmail() {
+	   String m_subject, m_body, m_sender, m_receiver;
+	   
+      public SendEmail(String subject, String body, String sender, String receiver) {
+    	  m_subject = subject;
+    	  m_body = body;
+    	  m_sender = sender;
+    	  m_receiver = receiver;
          this.execute();
       }
 
       @Override
       protected Void doInBackground(Void... arg0) {
          try {
-            GmailSender sender = new GmailSender("michaelsawyer92@gmail.com",
+            GmailSender sender = new GmailSender(m_sender,
                   "wogywimdjubybtnk");
-            sender.sendMail("This is Subject", "This is Body",
-                  "michaelsawyer92@gmail.com", "michaelsawyer92@gmail.com");
+            sender.sendMail(m_subject, m_body,
+                  m_sender, m_receiver);
          } catch (Exception e) {
             Log.e("SendMail", e.getMessage(), e);
          }

@@ -1,6 +1,6 @@
 package com.sawyer.easypgp;
 
-import java.nio.charset.Charset;
+import android.annotation.SuppressLint;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -13,8 +13,6 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import android.util.Base64;
-
 public class EncryptEmail {
    KeyPairGenerator kpg;
    KeyPair kp;
@@ -24,7 +22,8 @@ public class EncryptEmail {
    Cipher cipher, cipher1;
    String[] encrypted;
 
-   public String[] Encrypt(final String plainText)
+   @SuppressLint("TrulyRandom")
+public String[] Encrypt(final String plainText)
          throws NoSuchAlgorithmException, NoSuchPaddingException,
          InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
       kpg = KeyPairGenerator.getInstance("RSA");
