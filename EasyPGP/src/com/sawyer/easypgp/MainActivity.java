@@ -13,17 +13,24 @@ import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import javax.crypto.Cipher;
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.NoSuchProviderException;
+import javax.mail.Session;
+import javax.mail.Store;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -40,11 +47,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
+
+import com.sawyer.gmail.GmailSender;
 
 // TODO: Move utilities to separate classes.
 // TODO: Encrypt AES key with RSA encryption, then encrypt message with AES
@@ -108,9 +119,9 @@ public class MainActivity extends ActionBarActivity implements
 
       // Log Emails...
       Log.i("Emails", "About to create GmailInbox");
-      //GmailInbox gmail = new GmailInbox();
+      // GmailInbox gmail = new GmailInbox();
       Log.i("Emails", "Created GmailInbox");
-      //gmail.execute(this);
+      // gmail.execute(this);
       Log.i("Emails", "After calling gmail.read()");
    }
 
@@ -175,15 +186,18 @@ public class MainActivity extends ActionBarActivity implements
 
          String messageEncrypted = Base64.encodeToString(encodedBytes,
                Base64.DEFAULT);
-         emailIntent.setData(Uri.parse("mailto:"));
-         emailIntent.setType("text/plain");
-         emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] { recipientText
-               .getText().toString() });
-         emailIntent.putExtra(Intent.EXTRA_SUBJECT, subjectText.getText()
-               .toString());
-         // Log.d("com.sawyer.easypgp",contentEncrypted[0].toString());
-         emailIntent.putExtra(Intent.EXTRA_TEXT, messageEncrypted);
-         startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+         /*
+          * emailIntent.setData(Uri.parse("mailto:"));
+          * emailIntent.setType("text/plain");
+          * emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {
+          * recipientText .getText().toString() });
+          * emailIntent.putExtra(Intent.EXTRA_SUBJECT, subjectText.getText()
+          * .toString()); //
+          * Log.d("com.sawyer.easypgp",contentEncrypted[0].toString());
+          * emailIntent.putExtra(Intent.EXTRA_TEXT, messageEncrypted);
+          * startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+          */
+         new SendEmail();
          finish();
          Log.i("Finished sending email...", "");
       } catch (android.content.ActivityNotFoundException ex) {
@@ -421,5 +435,26 @@ public class MainActivity extends ActionBarActivity implements
       }
 
    }
+   private class SendEmail extends AsyncTask<Void, Void, Void> {
+      
+      public SendEmail() {
+         this.execute();
+      }
+
+      @Override
+      protected Void doInBackground(Void... arg0) {
+         try {
+            GmailSender sender = new GmailSender("michaelsawyer92@gmail.com",
+                  "wogywimdjubybtnk");
+            sender.sendMail("This is Subject", "This is Body",
+                  "michaelsawyer92@gmail.com", "michaelsawyer92@gmail.com");
+         } catch (Exception e) {
+            Log.e("SendMail", e.getMessage(), e);
+         }
+         return null;
+      }
+
+   }
+
 
 }

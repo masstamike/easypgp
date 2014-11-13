@@ -3,11 +3,14 @@
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="lib" path="libs/commons-codec-1.9.jar"/>
-	<classpathentry kind="lib" path="libs/javax.mail.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/javax.mail.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/activation.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/additionnal.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/android-support-v7-appcompat"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry excluding="Emailer/|Emailer/" kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="lib" path="src/Emailer"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/EmailApp"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

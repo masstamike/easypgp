@@ -5,6 +5,7 @@ import java.util.Properties;
 
 import javax.mail.Folder;
 import javax.mail.Message;
+import javax.activation.DataHandler;
 import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
@@ -17,8 +18,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class InboxFragment extends Fragment {
 
@@ -106,6 +110,12 @@ public class InboxFragment extends Fragment {
 						getActivity(), android.R.layout.simple_list_item_1,
 						list);
 				lv.setAdapter(adapter);
+				lv.setOnItemClickListener(new OnItemClickListener() {    
+				    @Override
+				    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+				        Toast.makeText(getActivity(), "You clicked an email!", Toast.LENGTH_SHORT).show();
+				    }
+				});
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
