@@ -108,13 +108,7 @@ public class MainActivity extends ActionBarActivity implements
     // Set up the drawer.
     mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
         (DrawerLayout) findViewById(R.id.drawer_layout));
-
-    // Log Emails...
-    Log.i("Emails", "About to create GmailInbox");
-    // GmailInbox gmail = new GmailInbox();
-    Log.i("Emails", "Created GmailInbox");
-    // gmail.execute(this);
-    Log.i("Emails", "After calling gmail.read()");
+    onSectionAttached(3);
   }
 
   @Override
@@ -321,7 +315,7 @@ public class MainActivity extends ActionBarActivity implements
       Log.d("Uncaught Exception", "Exception not caught.");
       e.printStackTrace();
     }
-    TextView encodedTV = (TextView) findViewById(R.id.decryptText);
+    TextView encodedTV = (TextView) findViewById(R.id.encryptedEmail);
     String encodedBytes = encodedTV.getText().toString();
     byte[] messageEncrypted = Base64.decode(encodedBytes, Base64.DEFAULT);
     Log.d("Encoded Bytes:", "Encoded Bytes: " + encodedBytes);
@@ -336,8 +330,9 @@ public class MainActivity extends ActionBarActivity implements
       Log.e(TAG, "RSA decryption error");
       e.printStackTrace();
     }
-    TextView tvdecoded = (TextView) findViewById(R.id.decryptedText);
+    TextView tvdecoded = (TextView) findViewById(R.id.encryptedEmail);
     tvdecoded.setText("[DECODED]:\n" + new String(decodedBytes));
+    findViewById(R.id.decodeButton).setEnabled(false);
   }
 
   // Runs when click send key button on ShareKey fragment.

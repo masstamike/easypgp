@@ -1,5 +1,9 @@
 package com.sawyer.easypgp;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -7,8 +11,11 @@ import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
+import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.Store;
+
+import com.sun.mail.imap.IMAPInputStream;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,6 +31,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 public class InboxFragment extends Fragment {
+
+  String[] bodies = null;
 
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
@@ -54,12 +63,48 @@ public class InboxFragment extends Fragment {
       return list;
     }
 
+    private String getStringFromInputStream(Object object) {
+
+      BufferedReader br = null;
+      StringBuilder sb = new StringBuilder();
+
+      String line;
+      try {
+
+        br = new BufferedReader(new InputStreamReader((InputStream) object));
+        while ((line = br.readLine()) != null) {
+          sb.append(line);
+        }
+
+      } catch (IOException e) {
+        e.printStackTrace();
+      } finally {
+        if (br != null) {
+          try {
+            br.close();
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        }
+      }
+
+      return sb.toString();
+
+    }
+
     public String[] print10Bodies(Message[] messages, int messageCount) {
       String[] list = new String[10];
+      Part[] m_mess = (Part[]) messages;
       for (int i = messageCount - 1, listI = 0; i > messageCount - 11; i--, listI++) {
         try {
-          list[listI] = (String) messages[i].getContent().toString();
+          Log.d("Emailer", "-------Message " + i + "---------");
+          Log.d("Emailer", messages[i].getContentType());
+          if (m_mess[i].isMimeType("text/plain"))
+            list[listI] = getStringFromInputStream(m_mess[i].getContent());
+          else
+            list[listI] = "Not an EasyPGP encrypted message.";
         } catch (Exception e) {
+          Log.i("Emailer", "print10Bodies...");
           e.printStackTrace();
         }
       }
@@ -100,6 +145,7 @@ public class InboxFragment extends Fragment {
         tenMessages = print10Subjects(inbox.getMessages(),
             inbox.getMessageCount());
         messages = inbox.getMessages();
+        bodies = print10Bodies(messages, messages.length);
         inbox.close(true);
         store.close();
 
@@ -119,10 +165,7 @@ public class InboxFragment extends Fragment {
       ListView lv = (ListView) getActivity().findViewById(R.id.emailList);
       try {
         ArrayList<String> list = new ArrayList<String>();
-        String[] subjects = print10Subjects(messages,
-            messages.length);
-        final String[] bodies = print10Bodies(messages,
-            messages.length);
+        String[] subjects = print10Subjects(messages, messages.length);
         for (int i = 0; i < subjects.length; i++)
           list.add(subjects[i]);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
