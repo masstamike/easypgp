@@ -1,9 +1,13 @@
 package com.sawyer.easypgp;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -15,8 +19,7 @@ import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.Store;
 
-import com.sun.mail.imap.IMAPInputStream;
-
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -33,6 +36,7 @@ import android.widget.ListView;
 public class InboxFragment extends Fragment {
 
   String[] bodies = null;
+  String[] list = null;
 
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
@@ -52,7 +56,7 @@ public class InboxFragment extends Fragment {
     }
 
     public String[] print10Subjects(Message[] messages, int messageCount) {
-      String[] list = new String[10];
+      list = new String[10];
       for (int i = messageCount - 1, listI = 0; i > messageCount - 11; i--, listI++) {
         try {
           list[listI] = messages[i].getSubject();
@@ -188,7 +192,46 @@ public class InboxFragment extends Fragment {
         e.printStackTrace();
       }
     }
-
   }
 
+  @Override
+  public void onPause() {
+    super.onPause();
+    String filename = "emailList";
+    FileOutputStream outputStream;
+
+    try {
+      outputStream = getActivity()
+          .openFileOutput(filename, Context.MODE_APPEND);
+      for (String s : list) {
+        outputStream.write(s.getBytes());
+      }
+      outputStream.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    String[] emailList = {};
+
+    try {
+      getActivity().openFileInput("emailList");
+      ObjectInputStream ois = new ObjectInputStream(getActivity().openFileInput("EmailList"));
+      emailList = (String[]) ois.readObject();
+    } catch (StreamCorruptedException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    // new FileInputStream(getActivity().openFileInput("EmailList"));
+ catch (ClassNotFoundException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
 }

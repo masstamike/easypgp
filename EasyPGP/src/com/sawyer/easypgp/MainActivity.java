@@ -247,8 +247,10 @@ public class MainActivity extends ActionBarActivity implements
       return true;
     } else if (id == R.id.action_example) {
       sendMessage(findViewById(R.layout.activity_main));
-    }
+      return true;
+    } else {
     return super.onOptionsItemSelected(item);
+    }
   }
 
   /**
