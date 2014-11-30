@@ -1,7 +1,7 @@
 package com.sawyer.easypgp;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +43,12 @@ public class InboxFragment extends Fragment {
     super.onCreate(savedInstanceState);
     // Define the xml file for this fragment
     View view = inflater.inflate(R.layout.fragment_inbox, container, false);
-    new RetrieveEmails();
+    File file = new File("emailList");
+    if (file.exists()){
+      onResume();
+    } else {
+      new RetrieveEmails();      
+    }
     return view;
   }
 
@@ -219,8 +224,15 @@ public class InboxFragment extends Fragment {
 
     try {
       getActivity().openFileInput("emailList");
-      ObjectInputStream ois = new ObjectInputStream(getActivity().openFileInput("EmailList"));
+      Log.d("EasyPGP", "Before ObjectInputStream");
+      ObjectInputStream ois = new ObjectInputStream(getActivity()
+          .openFileInput("emailList"));
+      Log.d("EasyPGP", "After ObjectInputStream");
       emailList = (String[]) ois.readObject();
+      Log.d("Email Inbox", "Email inbox cached contains:");
+      for (int i = 0; i < emailList.length; i++) {
+        Log.d("Email Inbox", emailList[i]);
+      }
     } catch (StreamCorruptedException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -229,7 +241,7 @@ public class InboxFragment extends Fragment {
       e.printStackTrace();
     }
     // new FileInputStream(getActivity().openFileInput("EmailList"));
- catch (ClassNotFoundException e) {
+    catch (ClassNotFoundException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
