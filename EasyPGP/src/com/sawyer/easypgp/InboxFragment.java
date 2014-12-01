@@ -2,11 +2,13 @@ package com.sawyer.easypgp;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -43,12 +45,6 @@ public class InboxFragment extends Fragment {
     super.onCreate(savedInstanceState);
     // Define the xml file for this fragment
     View view = inflater.inflate(R.layout.fragment_inbox, container, false);
-    File file = new File("emailList");
-    if (file.exists()){
-      onResume();
-    } else {
-      new RetrieveEmails();      
-    }
     return view;
   }
 
@@ -132,7 +128,6 @@ public class InboxFragment extends Fragment {
           "javax.net.ssl.SSLSocketFactory");
       props.put("mail.imaps.socketFactory.fallback", "false");
       props.setProperty("mail.imaps.quitwait", "false");
-      String[] tenMessages = null;
       Folder inbox = null;
       Message[] messages = null;
 
@@ -151,8 +146,6 @@ public class InboxFragment extends Fragment {
         Log.i("Emailer", "------------------------------");
         Log.i("Emailer", "Total Messages:- " + messageCount);
         Log.i("Emailer", "------------------------------");
-        tenMessages = print10Subjects(inbox.getMessages(),
-            inbox.getMessageCount());
         messages = inbox.getMessages();
         bodies = print10Bodies(messages, messages.length);
         inbox.close(true);
@@ -193,7 +186,6 @@ public class InboxFragment extends Fragment {
           }
         });
       } catch (Exception e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       }
     }
@@ -202,15 +194,20 @@ public class InboxFragment extends Fragment {
   @Override
   public void onPause() {
     super.onPause();
-    String filename = "emailList";
+    String filename = "emailList.obj";
     FileOutputStream outputStream;
+    File file = new File(getActivity().getFilesDir().getPath().toString()+filename);
 
     try {
-      outputStream = getActivity()
-          .openFileOutput(filename, Context.MODE_APPEND);
-      for (String s : list) {
-        outputStream.write(s.getBytes());
+      if (!file.exists()) {
+        if (!file.createNewFile()) {
+          throw new IOException("Unable to create file");
+        }
       }
+      outputStream = getActivity().openFileOutput(filename, Context.MODE_APPEND);
+      ObjectOutputStream out = new ObjectOutputStream(outputStream);
+      out.writeObject(list);
+      out.close();
       outputStream.close();
     } catch (Exception e) {
       e.printStackTrace();
@@ -219,31 +216,37 @@ public class InboxFragment extends Fragment {
 
   @Override
   public void onResume() {
+    Log.i("EasyPGP", "onResume()");
     super.onResume();
+    Log.i("EasyPGP", "onResume()...");
     String[] emailList = {};
-
-    try {
-      getActivity().openFileInput("emailList");
-      Log.d("EasyPGP", "Before ObjectInputStream");
-      ObjectInputStream ois = new ObjectInputStream(getActivity()
-          .openFileInput("emailList"));
-      Log.d("EasyPGP", "After ObjectInputStream");
-      emailList = (String[]) ois.readObject();
-      Log.d("Email Inbox", "Email inbox cached contains:");
-      for (int i = 0; i < emailList.length; i++) {
-        Log.d("Email Inbox", emailList[i]);
+    String filename = "emailList.obj";
+    File file = new File(filename);
+    if (file.exists()) {
+      Log.d("EasyPGP", "File emailList.obj exists. Path is " + filename);
+      try {
+        Log.d("EasyPGP", "Before ObjectInputStream");
+        FileInputStream fin = getActivity().openFileInput(filename);
+        ObjectInputStream ois = new ObjectInputStream(fin);
+        Log.d("EasyPGP", "After ObjectInputStream");
+        emailList = (String[]) ois.readObject();
+        Log.d("EasyPGP", ois.readObject().getClass().getName());
+        Log.d("Email Inbox", "Email inbox cached contains:");
+        for (int i = 0; i < emailList.length; i++) {
+          Log.d("Email Inbox", emailList[i]);
+        }
+        ois.close();
+      } catch (StreamCorruptedException e) {
+        e.printStackTrace();
+      } catch (IOException e) {
+        e.printStackTrace();
+      } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+      } catch (Exception e) {
+        e.printStackTrace();
       }
-    } catch (StreamCorruptedException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    // new FileInputStream(getActivity().openFileInput("EmailList"));
-    catch (ClassNotFoundException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    } else {
+      new RetrieveEmails();
     }
   }
 }
