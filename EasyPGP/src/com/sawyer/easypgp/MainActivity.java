@@ -48,6 +48,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sawyer.gmail.GmailSender;
+import com.sawyer.handlers.onClickHandlers;
 
 // TODO: Move utilities to separate classes.
 // TODO: Encrypt AES key with RSA encryption, then encrypt message with AES
@@ -109,7 +110,7 @@ public class MainActivity extends ActionBarActivity implements
     // Set up the drawer.
     mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
         (DrawerLayout) findViewById(R.id.drawer_layout));
-    onSectionAttached(3);
+    onSectionAttached(1);
   }
 
   @Override
@@ -231,7 +232,7 @@ public class MainActivity extends ActionBarActivity implements
       // Only show items in the action bar relevant to this screen
       // if the drawer is not showing. Otherwise, let the drawer
       // decide what to show in the action bar.
-      if (getTitle() == getString(R.string.title_compose)) {
+      if (mTitle == getString(R.string.title_compose)) {
         getMenuInflater().inflate(R.menu.compose, menu);
         restoreActionBar();
       }
@@ -252,7 +253,7 @@ public class MainActivity extends ActionBarActivity implements
       sendMessage(findViewById(R.layout.activity_main));
       return true;
     } else {
-    return super.onOptionsItemSelected(item);
+      return super.onOptionsItemSelected(item);
     }
   }
 
@@ -345,6 +346,36 @@ public class MainActivity extends ActionBarActivity implements
   // TODO: Move to separate class
   public void onClickSendKey(View view) {
 
+    ObjectInputStream ois = null;
+    PublicKey publicKey = null;
+
+    try {
+      FileInputStream file = this.getApplicationContext().openFileInput(
+          "publicKey");
+      ois = new ObjectInputStream(file);
+      publicKey = (PublicKey) ois.readObject();
+      Log.d("publicKey: ", publicKey.toString());
+    } catch (FileNotFoundException e1) {
+      e1.printStackTrace();
+    } catch (StreamCorruptedException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+
+    EditText recipientText = (EditText) findViewById(R.id.editText1);
+    String recipient = recipientText.getText().toString();
+    EditText senderText = (EditText) findViewById(R.id.editText2);
+    String sender = senderText.getText().toString();
+    String subject = sender + "would like to share his EasyPGP public key with you!";
+    String message = publicKey.getEncoded().toString();
+    new SendEmail(subject, message, "michaelsawyer92@gmail.com", recipient);
+    Log.i("Finished sending email...", "");
+    Toast.makeText(MainActivity.this, "Email Sent!", Toast.LENGTH_SHORT)
+        .show();
+    /*
     // Declare variables;
     NfcAdapter mNfcAdapter;
     ObjectInputStream ois = null;
@@ -384,6 +415,7 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     mNfcAdapter.setNdefPushMessage(message, this, this);
+    */
 
   }
 
