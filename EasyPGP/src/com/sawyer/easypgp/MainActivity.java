@@ -74,6 +74,7 @@ public class MainActivity extends ActionBarActivity implements
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
     ObjectOutputStream oos = null;
     File file = getBaseContext().getFileStreamPath("publicKey");
     if (!file.exists()) {
@@ -230,8 +231,10 @@ public class MainActivity extends ActionBarActivity implements
       // Only show items in the action bar relevant to this screen
       // if the drawer is not showing. Otherwise, let the drawer
       // decide what to show in the action bar.
-      getMenuInflater().inflate(R.menu.main, menu);
-      restoreActionBar();
+      if (getTitle() == getString(R.string.title_compose)) {
+        getMenuInflater().inflate(R.menu.compose, menu);
+        restoreActionBar();
+      }
       return true;
     }
     return super.onCreateOptionsMenu(menu);
@@ -294,6 +297,7 @@ public class MainActivity extends ActionBarActivity implements
 
   // Runs when click decode on decode fragment.
   // TODO: Move to separate class
+  @SuppressLint("CutPasteId")
   public void onClickDecode(View view) {
 
     ObjectInputStream ois = null;
