@@ -18,6 +18,7 @@ import javax.mail.NoSuchProviderException;
 import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.Store;
+import javax.mail.internet.InternetAddress;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -31,12 +32,24 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import com.sawyer.adapters.EmailArrayAdapter;
 
 public class InboxFragment extends Fragment {
 
   String[] bodies = null;
   String[] list = null;
+  String[] senders = null;
+  boolean[] types = null;
+
+  private static class EmailHolder {
+    public TextView emailSenderView;
+    public TextView emailSubjectView;
+    public ImageView img;
+  }
 
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
@@ -44,10 +57,10 @@ public class InboxFragment extends Fragment {
     // Define the xml file for this fragment
     View view = inflater.inflate(R.layout.fragment_inbox, container, false);
     File file = new File("emailList");
-    if (file.exists()){
+    if (file.exists()) {
       onResume();
     } else {
-      new RetrieveEmails();      
+      new RetrieveEmails();
     }
     return view;
   }
@@ -108,10 +121,27 @@ public class InboxFragment extends Fragment {
         try {
           Log.d("Emailer", "-------Message " + i + "---------");
           Log.d("Emailer", messages[i].getContentType());
-          if (m_mess[i].isMimeType("text/plain"))
+          if (m_mess[i].isMimeType("text/plain")) {
             list[listI] = getStringFromInputStream(m_mess[i].getContent());
-          else
+          } else {
             list[listI] = "Not an EasyPGP encrypted message.";
+          }
+        } catch (Exception e) {
+          Log.i("Emailer", "print10Bodies...");
+          e.printStackTrace();
+        }
+      }
+      return list;
+    }
+
+    public String[] print10Senders(Message[] messages, int messageCount) {
+      String[] list = new String[10];
+      
+      for (int i = messageCount - 1, listI = 0; i > messageCount - 11; i--, listI++) {
+        try {
+          Log.d("Emailer", "-------Message " + i + "---------");
+          Log.d("Emailer", messages[i].getContentType());
+          list[listI] = InternetAddress.toString(messages[i].getFrom());
         } catch (Exception e) {
           Log.i("Emailer", "print10Bodies...");
           e.printStackTrace();
@@ -155,6 +185,7 @@ public class InboxFragment extends Fragment {
             inbox.getMessageCount());
         messages = inbox.getMessages();
         bodies = print10Bodies(messages, messages.length);
+        senders = print10Senders(messages, messages.length);
         inbox.close(true);
         store.close();
 
@@ -174,11 +205,14 @@ public class InboxFragment extends Fragment {
       ListView lv = (ListView) getActivity().findViewById(R.id.emailList);
       try {
         ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> sender_list = new ArrayList<String>();
         String[] subjects = print10Subjects(messages, messages.length);
-        for (int i = 0; i < subjects.length; i++)
-          list.add(subjects[i]);
+        for (int i = 0; i < subjects.length; i++) {
+          //list.add(subjects[i]);
+          list.add(senders[i]);
+        }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-            android.R.layout.simple_list_item_1, list);
+            R.layout.email_row_layout, R.id.subject, list);
         lv.setAdapter(adapter);
         lv.setOnItemClickListener(new OnItemClickListener() {
           @Override

@@ -21,7 +21,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.nfc.FormatException;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.os.AsyncTask;
@@ -48,7 +47,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sawyer.gmail.GmailSender;
-import com.sawyer.handlers.onClickHandlers;
 
 // TODO: Move utilities to separate classes.
 // TODO: Encrypt AES key with RSA encryption, then encrypt message with AES
@@ -373,7 +371,7 @@ public class MainActivity extends ActionBarActivity implements
     String message = publicKey.getEncoded().toString();
     new SendEmail(subject, message, "michaelsawyer92@gmail.com", recipient);
     Log.i("Finished sending email...", "");
-    Toast.makeText(MainActivity.this, "Email Sent!", Toast.LENGTH_SHORT)
+    Toast.makeText(MainActivity.this, "Public Key Sent!", Toast.LENGTH_SHORT)
         .show();
     /*
     // Declare variables;
