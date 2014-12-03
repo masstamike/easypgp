@@ -173,8 +173,7 @@ public class MainActivity extends ActionBarActivity implements
           Base64.DEFAULT);
       String recipient = recipientText.getText().toString();
       String subject = subjectText.getText().toString();
-      String message = "---EasyPGP Message Begin---" + messageEncrypted
-          + "---EasyPGP Message End---";
+      String message = "---EasyPGP Message Begin---" + messageEncrypted;
       new SendEmail(subject, message, "michaelsawyer92@gmail.com", recipient);
       Log.i("Finished sending email...", "");
       Toast.makeText(MainActivity.this, "Email Sent!", Toast.LENGTH_SHORT)

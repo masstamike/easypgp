@@ -3,6 +3,7 @@ package com.sawyer.adapters;
 import com.sawyer.easypgp.R;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,8 +50,10 @@ public class EmailArrayAdapter extends ArrayAdapter<String> {
     boolean s = types[position];
     if (s) {
       emailHolder.img.setImageResource(R.drawable.ic_launcher);
+      rowView.setBackgroundColor(Color.rgb(69, 126, 51));
     } else {
       emailHolder.img.setImageResource(R.drawable.ic_waves);
+      rowView.setBackgroundColor(Color.rgb(195, 119, 126));
     }
     return rowView;
   }

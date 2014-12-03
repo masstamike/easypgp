@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">EasyPGP</string>
-    <string name="title_compose">Compse</string>
+    <string name="title_compose">Compose</string>
     <string name="title_decrypt">Decrypt</string>
     <string name="title_share_key">Share Key</string>
     <string name="title_inbox">Inbox</string>
