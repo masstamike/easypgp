@@ -173,7 +173,8 @@ public class MainActivity extends ActionBarActivity implements
           Base64.DEFAULT);
       String recipient = recipientText.getText().toString();
       String subject = subjectText.getText().toString();
-      String message = messageEncrypted;
+      String message = "---EasyPGP Message Begin---" + messageEncrypted
+          + "---EasyPGP Message End---";
       new SendEmail(subject, message, "michaelsawyer92@gmail.com", recipient);
       Log.i("Finished sending email...", "");
       Toast.makeText(MainActivity.this, "Email Sent!", Toast.LENGTH_SHORT)
@@ -202,7 +203,7 @@ public class MainActivity extends ActionBarActivity implements
     case 2:
       mTitle = getString(R.string.title_decrypt);
       Fragment frag = new DecodeFragment();
-      ft.replace(R.id.container, frag).commit();
+      ft.replace(R.id.container, frag).addToBackStack(null).commit();
       break;
     case 3:
       mTitle = getString(R.string.title_inbox);
@@ -212,7 +213,7 @@ public class MainActivity extends ActionBarActivity implements
     case 4:
       mTitle = getString(R.string.title_share_key);
       Fragment share_key_frag = new ShareKeyFragment();
-      ft.replace(R.id.container, share_key_frag).commit();
+      ft.replace(R.id.container, share_key_frag).addToBackStack(null).commit();
       break;
     }
   }
@@ -232,6 +233,8 @@ public class MainActivity extends ActionBarActivity implements
       // decide what to show in the action bar.
       if (mTitle == getString(R.string.title_compose)) {
         getMenuInflater().inflate(R.menu.compose, menu);
+        restoreActionBar();
+      } else {
         restoreActionBar();
       }
       return true;
@@ -321,7 +324,9 @@ public class MainActivity extends ActionBarActivity implements
       e.printStackTrace();
     }
     TextView encodedTV = (TextView) findViewById(R.id.encryptedEmail);
-    String encodedBytes = encodedTV.getText().toString();
+    String encodedBytes = encodedTV.getText().toString()
+        .replaceAll("---EasyPGP Message Begin---", "")
+        .replaceAll("---EasyPGP Message End---", "");
     byte[] messageEncrypted = Base64.decode(encodedBytes, Base64.DEFAULT);
     Log.d("Encoded Bytes:", "Encoded Bytes: " + encodedBytes);
     // Decode the encoded data with RSA public key
@@ -367,53 +372,37 @@ public class MainActivity extends ActionBarActivity implements
     String recipient = recipientText.getText().toString();
     EditText senderText = (EditText) findViewById(R.id.editText2);
     String sender = senderText.getText().toString();
-    String subject = sender + " would like to share his EasyPGP public key with you!";
+    String subject = sender
+        + " would like to share his EasyPGP public key with you!";
     String message = publicKey.getEncoded().toString();
     new SendEmail(subject, message, "michaelsawyer92@gmail.com", recipient);
     Log.i("Finished sending email...", "");
     Toast.makeText(MainActivity.this, "Public Key Sent!", Toast.LENGTH_SHORT)
         .show();
     /*
-    // Declare variables;
-    NfcAdapter mNfcAdapter;
-    ObjectInputStream ois = null;
-    PublicKey publicKey = null;
-    NdefMessage message = null;
-
-    // Check to see if NFC is available
-    mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-    if (mNfcAdapter == null) {
-      Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
-      finish();
-      return;
-    }
-
-    // Read public key
-    try {
-      FileInputStream file = this.getApplicationContext().openFileInput(
-          "publicKey");
-      ois = new ObjectInputStream(file);
-      publicKey = (PublicKey) ois.readObject();
-      Log.d("publicKey: ", publicKey.toString());
-    } catch (FileNotFoundException e1) {
-      e1.printStackTrace();
-    } catch (StreamCorruptedException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-    }
-
-    // Create message
-    try {
-      message = new NdefMessage(publicKey.getEncoded());
-    } catch (FormatException e) {
-      e.printStackTrace();
-    }
-
-    mNfcAdapter.setNdefPushMessage(message, this, this);
-    */
+     * // Declare variables; NfcAdapter mNfcAdapter; ObjectInputStream ois =
+     * null; PublicKey publicKey = null; NdefMessage message = null;
+     * 
+     * // Check to see if NFC is available mNfcAdapter =
+     * NfcAdapter.getDefaultAdapter(this); if (mNfcAdapter == null) {
+     * Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
+     * finish(); return; }
+     * 
+     * // Read public key try { FileInputStream file =
+     * this.getApplicationContext().openFileInput( "publicKey"); ois = new
+     * ObjectInputStream(file); publicKey = (PublicKey) ois.readObject();
+     * Log.d("publicKey: ", publicKey.toString()); } catch
+     * (FileNotFoundException e1) { e1.printStackTrace(); } catch
+     * (StreamCorruptedException e) { e.printStackTrace(); } catch (IOException
+     * e) { e.printStackTrace(); } catch (ClassNotFoundException e) {
+     * e.printStackTrace(); }
+     * 
+     * // Create message try { message = new
+     * NdefMessage(publicKey.getEncoded()); } catch (FormatException e) {
+     * e.printStackTrace(); }
+     * 
+     * mNfcAdapter.setNdefPushMessage(message, this, this);
+     */
 
   }
 

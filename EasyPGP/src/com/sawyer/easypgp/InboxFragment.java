@@ -43,25 +43,21 @@ public class InboxFragment extends Fragment {
   String[] bodies = null;
   String[] list = null;
   String[] senders = null;
-  boolean[] types = null;
-
-  private static class EmailHolder {
-    public TextView emailSenderView;
-    public TextView emailSubjectView;
-    public ImageView img;
-  }
+  boolean[] types = new boolean[10];
+  RetrieveEmails emails;
 
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
+
     super.onCreate(savedInstanceState);
     // Define the xml file for this fragment
     View view = inflater.inflate(R.layout.fragment_inbox, container, false);
     File file = new File("emailList");
-    if (file.exists()) {
-      onResume();
-    } else {
-      new RetrieveEmails();
-    }
+    // if (file.exists()) {
+    // onResume();
+    // } else {
+    emails = new RetrieveEmails();
+    // }
     return view;
   }
 
@@ -122,8 +118,16 @@ public class InboxFragment extends Fragment {
           Log.d("Emailer", "-------Message " + i + "---------");
           Log.d("Emailer", messages[i].getContentType());
           if (m_mess[i].isMimeType("text/plain")) {
+            Log.d("EasyPGP", "True");
             list[listI] = getStringFromInputStream(m_mess[i].getContent());
+            if(list[listI].startsWith("---EasyPGP Message Begin---")) {
+              types[listI] = true;
+            } else {
+              types[listI] = false;
+            }
           } else {
+            types[listI] = false;
+            Log.d("EasyPGP", "False");
             list[listI] = "Not an EasyPGP encrypted message.";
           }
         } catch (Exception e) {
@@ -136,7 +140,7 @@ public class InboxFragment extends Fragment {
 
     public String[] print10Senders(Message[] messages, int messageCount) {
       String[] list = new String[10];
-      
+
       for (int i = messageCount - 1, listI = 0; i > messageCount - 11; i--, listI++) {
         try {
           Log.d("Emailer", "-------Message " + i + "---------");
@@ -181,8 +185,7 @@ public class InboxFragment extends Fragment {
         Log.i("Emailer", "------------------------------");
         Log.i("Emailer", "Total Messages:- " + messageCount);
         Log.i("Emailer", "------------------------------");
-        tenMessages = print10Subjects(inbox.getMessages(),
-            inbox.getMessageCount());
+        list = print10Subjects(inbox.getMessages(), inbox.getMessageCount());
         messages = inbox.getMessages();
         bodies = print10Bodies(messages, messages.length);
         senders = print10Senders(messages, messages.length);
@@ -204,16 +207,12 @@ public class InboxFragment extends Fragment {
       super.onPostExecute(messages);
       ListView lv = (ListView) getActivity().findViewById(R.id.emailList);
       try {
-        ArrayList<String> list = new ArrayList<String>();
-        ArrayList<String> sender_list = new ArrayList<String>();
-        String[] subjects = print10Subjects(messages, messages.length);
-        for (int i = 0; i < subjects.length; i++) {
-          //list.add(subjects[i]);
-          list.add(senders[i]);
+        for (int i = 0; i < 10; i++) {
+          Log.d("EasyPGP", "Type[" + i + "] is " + types[i]);
         }
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-            R.layout.email_row_layout, R.id.subject, list);
-        lv.setAdapter(adapter);
+        EmailArrayAdapter m_adapter = new EmailArrayAdapter(getActivity(),
+            senders, list, types);
+        lv.setAdapter(m_adapter);
         lv.setOnItemClickListener(new OnItemClickListener() {
           @Override
           public void onItemClick(AdapterView<?> adapterView, View view,
@@ -249,6 +248,12 @@ public class InboxFragment extends Fragment {
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  @Override
+  public void onDetach() {
+    emails.cancel(true);
+    super.onDetach();
   }
 
   @Override
