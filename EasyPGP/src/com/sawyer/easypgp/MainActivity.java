@@ -369,7 +369,7 @@ public class MainActivity extends ActionBarActivity implements
     String recipient = recipientText.getText().toString();
     EditText senderText = (EditText) findViewById(R.id.editText2);
     String sender = senderText.getText().toString();
-    String subject = sender + "would like to share his EasyPGP public key with you!";
+    String subject = sender + " would like to share his EasyPGP public key with you!";
     String message = publicKey.getEncoded().toString();
     new SendEmail(subject, message, "michaelsawyer92@gmail.com", recipient);
     Log.i("Finished sending email...", "");

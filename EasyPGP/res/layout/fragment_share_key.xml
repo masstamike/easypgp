@@ -9,11 +9,24 @@
 
     <!-- tools:context="com.sawyer.easypgp.MainActivity$PlaceholderFragment" -->
 
-    <TextView
-        android:id="@+id/decryptedText"
+    <EditText
+        android:id="@+id/editText1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/decodeButton" />
+        android:ems="10"
+        android:hint="To"
+        android:inputType="textEmailAddress" />
+
+    <EditText
+        android:id="@+id/editText2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/editText1"
+        android:layout_below="@+id/editText1"
+        android:ems="10"
+        android:hint="From"
+        android:inputType="textEmailSubject" />
 
     <Button
         android:id="@+id/decodeButton"
@@ -23,11 +36,11 @@
         android:layout_centerVertical="true"
         android:onClick="onClickSendKey"
         android:text="Send Key" />
-    
-    <TextView 
+
+    <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/decodeButton"/>
+        android:layout_below="@id/decodeButton" />
 
 </RelativeLayout>
