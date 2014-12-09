@@ -31,6 +31,10 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".NfcActivity"
+            android:label="Share Key" >
+        </activity>
+        <activity
             android:name=".DecodeFragment"
             android:label="@string/title_activity_decode_fragment" >
         </activity>

@@ -210,9 +210,32 @@ public class MainActivity extends ActionBarActivity implements
       ft.replace(R.id.container, inbox_frag).addToBackStack(null).commit();
       break;
     case 4:
-      mTitle = getString(R.string.title_share_key);
-      Fragment share_key_frag = new ShareKeyFragment();
-      ft.replace(R.id.container, share_key_frag).addToBackStack(null).commit();
+      ObjectInputStream ois = null;
+      PublicKey publicKey = null;
+
+      try {
+        FileInputStream file = this.getApplicationContext().openFileInput(
+            "publicKey");
+        ois = new ObjectInputStream(file);
+        publicKey = (PublicKey) ois.readObject();
+        Log.d("publicKey: ", publicKey.toString());
+      } catch (FileNotFoundException e1) {
+        e1.printStackTrace();
+      } catch (StreamCorruptedException e) {
+        e.printStackTrace();
+      } catch (IOException e) {
+        e.printStackTrace();
+      } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+      }
+
+      Intent intent = new Intent(this, NfcActivity.class);
+      intent.putExtra("com.sawyer.easypgp.PUBLIC_KEY", publicKey.toString());
+      startActivity(intent);
+
+//      mTitle = getString(R.string.title_share_key);
+//      Fragment share_key_frag = new ShareKeyFragment();
+//      ft.replace(R.id.container, share_key_frag).addToBackStack(null).commit();
       break;
     }
   }
