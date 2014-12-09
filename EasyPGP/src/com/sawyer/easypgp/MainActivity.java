@@ -230,7 +230,7 @@ public class MainActivity extends ActionBarActivity implements
       }
 
       Intent intent = new Intent(this, NfcActivity.class);
-      intent.putExtra("com.sawyer.easypgp.PUBLIC_KEY", publicKey.toString());
+      intent.putExtra("com.sawyer.easypgp.PUBLIC_KEY", publicKey.getEncoded());
       startActivity(intent);
 
 //      mTitle = getString(R.string.title_share_key);

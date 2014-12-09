@@ -1,10 +1,16 @@
 package com.sawyer.easypgp;
 
 import java.io.UnsupportedEncodingException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
@@ -19,6 +25,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,22 +33,25 @@ public class NfcActivity extends ActionBarActivity {
 
   public static final String TAG = "NfcDemo";
 
+  private Context ctx = this;
   private TextView mTextView;
   private NfcAdapter mNfcAdapter;
+  private CheckBox checkBoxRead;
   public static final String MIME_TEXT_PLAIN = "text/plain";
-  public String publicKeyString;
+  public static final String MIME_PUBLIC_KEY = "application/pubk.com.sawyer.easypgp";
+  public byte[] publicKeyBytes;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_nfc);
 
+    // Wiring up UI
     Intent intent = getIntent();
-    publicKeyString = intent.getStringExtra("com.sawyer.easypgp.PUBLIC_KEY");
-
+    publicKeyBytes = intent.getByteArrayExtra("com.sawyer.easypgp.PUBLIC_KEY");
     mTextView = (TextView) findViewById(R.id.nfc_tv);
-
     mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+    checkBoxRead = (CheckBox) findViewById(R.id.checkBoxRead);
 
     if (mNfcAdapter == null) {
       // Stop here, we definitely need NFC
@@ -121,11 +131,14 @@ public class NfcActivity extends ActionBarActivity {
     if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
 
       String type = intent.getType();
-      if (MIME_TEXT_PLAIN.equals(type)) {
+      if (MIME_PUBLIC_KEY.equals(type)) {
 
         Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-        //new NdefReaderTask().execute(tag);
-        new NdefWriterTask().execute(tag);
+        if (checkBoxRead.isChecked()) {
+          new NdefReaderTask().execute(tag);
+        } else {
+          new NdefWriterTask().execute(tag);
+        }
 
       } else {
         Log.d(TAG, "Wrong mime type: " + type);
@@ -170,7 +183,7 @@ public class NfcActivity extends ActionBarActivity {
     filters[0].addAction(NfcAdapter.ACTION_NDEF_DISCOVERED);
     filters[0].addCategory(Intent.CATEGORY_DEFAULT);
     try {
-      filters[0].addDataType(MIME_TEXT_PLAIN);
+      filters[0].addDataType(MIME_PUBLIC_KEY);
     } catch (MalformedMimeTypeException e) {
       throw new RuntimeException("Check your mime type.");
     }
@@ -191,7 +204,6 @@ public class NfcActivity extends ActionBarActivity {
     adapter.disableForegroundDispatch(activity);
   }
 
-  @SuppressWarnings("unused")
   private NdefRecord createRecord(String text)
       throws UnsupportedEncodingException {
 
@@ -226,21 +238,38 @@ public class NfcActivity extends ActionBarActivity {
         return null;
       }
       try {
-      NdefRecord[] records = { createRecord(publicKeyString) };
-
-      NdefMessage message = new NdefMessage(records);
-      ndef.connect();
-      ndef.writeNdefMessage(message);
-      ndef.close();
+        // NdefRecord[] records = { createRecord(publicKeyString) };
+        //
+        // NdefMessage message = new NdefMessage(records);
+        NdefMessage msg = new NdefMessage(
+            new NdefRecord[] { NdefRecord.createMime(
+                "application/pubk.com.sawyer.easypgp", publicKeyBytes) });
+        ndef.connect();
+        ndef.writeNdefMessage(msg);
+        ndef.close();
+        return "Success";
       } catch (Exception e) {
         e.printStackTrace();
       }
 
       return null;
     }
+
+    @Override
+    protected void onPostExecute(String result) {
+      if (result == "Success") {
+        Toast.makeText(ctx, "Successfully wrote Public Key to NFC tag!",
+            Toast.LENGTH_LONG).show();
+      } else {
+        Toast.makeText(ctx, "Failed to write Public Key to NFC tag!",
+            Toast.LENGTH_LONG).show();
+      }
+    }
   }
 
   private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
+    
+    PublicKey pubkey;
 
     @Override
     protected String doInBackground(Tag... params) {
@@ -259,7 +288,8 @@ public class NfcActivity extends ActionBarActivity {
         if (ndefRecord.getTnf() == NdefRecord.TNF_WELL_KNOWN
             && Arrays.equals(ndefRecord.getType(), NdefRecord.RTD_TEXT)) {
           try {
-            return readText(ndefRecord);
+            pubkey = readText(ndefRecord);
+            return pubkey.toString();
           } catch (UnsupportedEncodingException e) {
             Log.e(TAG, "Unsupported Encoding", e);
           }
@@ -269,7 +299,7 @@ public class NfcActivity extends ActionBarActivity {
       return null;
     }
 
-    private String readText(NdefRecord record)
+    private PublicKey readText(NdefRecord record)
         throws UnsupportedEncodingException {
       /*
        * See NFC forum specification for "Text Record Type Definition" at 3.2.1
@@ -281,26 +311,25 @@ public class NfcActivity extends ActionBarActivity {
        */
 
       byte[] payload = record.getPayload();
+      
+      PublicKey publicKey = null;
+      try {
+        publicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(payload));
+      } catch (InvalidKeySpecException e) {
+        e.printStackTrace();
+      } catch (NoSuchAlgorithmException e) {
+        e.printStackTrace();
+      }
 
-      // Get the Text Encoding
-      String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
+      // Get the PublicKey object
+      return publicKey;
 
-      // Get the Language Code
-      int languageCodeLength = payload[0] & 0063;
-
-      // String languageCode = new String(payload, 1, languageCodeLength,
-      // "US-ASCII");
-      // e.g. "en"
-
-      // Get the Text
-      return new String(payload, languageCodeLength + 1, payload.length
-          - languageCodeLength - 1, textEncoding);
-    }
+      }
 
     @Override
     protected void onPostExecute(String result) {
       if (result != null) {
-        mTextView.setText("Read content: " + result);
+        mTextView.setText("Public Key: " + result);
       }
     }
   }

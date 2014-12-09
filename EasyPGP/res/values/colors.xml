@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="light_red">#C3777E</color>
-    <color name="light_green">#457e33</color>
+    <color name="not_encrypted_text">#9babe5</color>
+    <color name="encrypted_text">#627dde</color>
 
 </resources>

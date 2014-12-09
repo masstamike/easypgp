@@ -50,10 +50,10 @@ public class EmailArrayAdapter extends ArrayAdapter<String> {
     boolean s = types[position];
     if (s) {
       emailHolder.img.setImageResource(R.drawable.ic_launcher);
-      rowView.setBackgroundColor(Color.rgb(69, 126, 51));
+      rowView.setBackgroundColor(Color.rgb(98, 125, 222));
     } else {
       emailHolder.img.setImageResource(R.drawable.ic_waves);
-      rowView.setBackgroundColor(Color.rgb(195, 119, 126));
+      rowView.setBackgroundColor(Color.rgb(155, 171, 229));
     }
     return rowView;
   }

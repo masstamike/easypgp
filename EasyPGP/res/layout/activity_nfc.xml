@@ -8,10 +8,39 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.sawyer.easypgp.NfcActivity" >
 
+    <CheckBox
+        android:id="@+id/checkBoxRead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/read_write_check_box" />
+
+    <EditText
+        android:id="@+id/contactName"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/checkBoxRead"
+        android:hint="@string/contact_name" />
+
     <TextView
         android:id="@+id/nfc_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentRight="false"
+        android:layout_below="@id/contactName"
+        android:layout_marginTop="10dp"
+        android:text="@string/nfc_default" />
+
+    <Button
+        android:id="@+id/saveContactButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:text="@string/save_contact" />
 
 </RelativeLayout>
