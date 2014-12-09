@@ -33,7 +33,6 @@ public class NfcActivity extends ActionBarActivity {
 
   public static final String TAG = "NfcDemo";
 
-  private Context ctx = this;
   private TextView mTextView;
   private NfcAdapter mNfcAdapter;
   private CheckBox checkBoxRead;
@@ -258,17 +257,18 @@ public class NfcActivity extends ActionBarActivity {
     @Override
     protected void onPostExecute(String result) {
       if (result == "Success") {
-        Toast.makeText(ctx, "Successfully wrote Public Key to NFC tag!",
-            Toast.LENGTH_LONG).show();
+        Toast.makeText(NfcActivity.this,
+            "Successfully wrote Public Key to NFC tag!", Toast.LENGTH_LONG)
+            .show();
       } else {
-        Toast.makeText(ctx, "Failed to write Public Key to NFC tag!",
-            Toast.LENGTH_LONG).show();
+        Toast.makeText(NfcActivity.this,
+            "Failed to write Public Key to NFC tag!", Toast.LENGTH_LONG).show();
       }
     }
   }
 
   private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
-    
+
     PublicKey pubkey;
 
     @Override
@@ -285,21 +285,18 @@ public class NfcActivity extends ActionBarActivity {
 
       NdefRecord[] records = ndefMessage.getRecords();
       for (NdefRecord ndefRecord : records) {
-        if (ndefRecord.getTnf() == NdefRecord.TNF_WELL_KNOWN
-            && Arrays.equals(ndefRecord.getType(), NdefRecord.RTD_TEXT)) {
-          try {
-            pubkey = readText(ndefRecord);
-            return pubkey.toString();
-          } catch (UnsupportedEncodingException e) {
-            Log.e(TAG, "Unsupported Encoding", e);
-          }
+        try {
+          pubkey = readKey(ndefRecord);
+          return pubkey.toString();
+        } catch (UnsupportedEncodingException e) {
+          Log.e(TAG, "Unsupported Encoding", e);
         }
       }
 
       return null;
     }
 
-    private PublicKey readText(NdefRecord record)
+    private PublicKey readKey(NdefRecord record)
         throws UnsupportedEncodingException {
       /*
        * See NFC forum specification for "Text Record Type Definition" at 3.2.1
@@ -311,10 +308,11 @@ public class NfcActivity extends ActionBarActivity {
        */
 
       byte[] payload = record.getPayload();
-      
+
       PublicKey publicKey = null;
       try {
-        publicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(payload));
+        publicKey = KeyFactory.getInstance("RSA").generatePublic(
+            new X509EncodedKeySpec(payload));
       } catch (InvalidKeySpecException e) {
         e.printStackTrace();
       } catch (NoSuchAlgorithmException e) {
@@ -324,7 +322,7 @@ public class NfcActivity extends ActionBarActivity {
       // Get the PublicKey object
       return publicKey;
 
-      }
+    }
 
     @Override
     protected void onPostExecute(String result) {
