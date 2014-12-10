@@ -12,10 +12,10 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_decode_fragment">Decode</string>
     <string name="read_write_check_box">Read?</string>
-    <string name="nfc_default">
-        Checking if NFC is available on your device.
-    </string>
+    <string name="nfc_default">        Checking if NFC is available on your device.</string>
     <string name="save_contact">Save Contact!</string>
     <string name="contact_name">Email Address&#8230;</string>
+    <string name="title_activity_preference">Settings</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

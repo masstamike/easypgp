@@ -38,6 +38,10 @@
             android:name=".DecodeFragment"
             android:label="@string/title_activity_decode_fragment" >
         </activity>
+        <activity
+            android:name=".AppPreferences"
+            android:label="@string/title_activity_preference" >
+        </activity>
     </application>
 
 </manifest>

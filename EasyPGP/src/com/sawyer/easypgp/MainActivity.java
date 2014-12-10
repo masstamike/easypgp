@@ -21,12 +21,14 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -53,6 +55,9 @@ import com.sawyer.gmail.GmailSender;
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class MainActivity extends ActionBarActivity implements
     NavigationDrawerFragment.NavigationDrawerCallbacks {
+  
+  String userEmail;
+  String userPassword;
 
   static final String TAG = "AsymmetricAlgorithmRSA";
 
@@ -73,6 +78,11 @@ public class MainActivity extends ActionBarActivity implements
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
+    SharedPreferences sharedPrefs = PreferenceManager
+        .getDefaultSharedPreferences(this);
+    userEmail = sharedPrefs.getString("email", "");
+    userPassword = sharedPrefs.getString("password", "");
 
     ObjectOutputStream oos = null;
     File file = getBaseContext().getFileStreamPath("publicKey");
@@ -126,26 +136,52 @@ public class MainActivity extends ActionBarActivity implements
   }
 
   public void sendMessage(View view) {
+    EditText recipientText = (EditText) findViewById(R.id.editText1);
     try {
       // Retrieve Key
       // TODO: Move this to it's own function in utilities
       ObjectInputStream ois = null;
       PublicKey publicKey = null;
 
-      try {
-        FileInputStream file = this.getApplicationContext().openFileInput(
-            "publicKey");
-        ois = new ObjectInputStream(file);
-        publicKey = (PublicKey) ois.readObject();
-        Log.d("publicKey: ", publicKey.toString());
-      } catch (FileNotFoundException e1) {
-        e1.printStackTrace();
-      } catch (StreamCorruptedException e) {
-        e.printStackTrace();
-      } catch (IOException e) {
-        e.printStackTrace();
-      } catch (ClassNotFoundException e) {
-        e.printStackTrace();
+      File searchFile = getBaseContext().getFileStreamPath(
+          recipientText.getText().toString());
+      if (searchFile.exists()) {
+        Toast.makeText(MainActivity.this,
+            "Sending with recipient's public key", Toast.LENGTH_SHORT).show();
+        try {
+          FileInputStream file = this.getApplicationContext().openFileInput(
+              recipientText.getText().toString());
+          ois = new ObjectInputStream(file);
+          publicKey = (PublicKey) ois.readObject();
+          Log.d("publicKey: ", publicKey.toString());
+        } catch (FileNotFoundException e1) {
+          e1.printStackTrace();
+        } catch (StreamCorruptedException e) {
+          e.printStackTrace();
+        } catch (IOException e) {
+          e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+          e.printStackTrace();
+        }
+      } else {
+        Toast.makeText(MainActivity.this, "Sending with personal public key",
+            Toast.LENGTH_SHORT).show();
+        try {
+          FileInputStream file = this.getApplicationContext().openFileInput(
+              "publicKey");
+          ois = new ObjectInputStream(file);
+          publicKey = (PublicKey) ois.readObject();
+          Log.d("publicKey: ", publicKey.toString());
+        } catch (FileNotFoundException e1) {
+          e1.printStackTrace();
+        } catch (StreamCorruptedException e) {
+          e.printStackTrace();
+        } catch (IOException e) {
+          e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+          e.printStackTrace();
+        }
+
       }
 
       // Original text
@@ -165,7 +201,6 @@ public class MainActivity extends ActionBarActivity implements
 
       // Send an email
 
-      EditText recipientText = (EditText) findViewById(R.id.editText1);
       EditText subjectText = (EditText) findViewById(R.id.editText2);
       // EditText contentText = (EditText) findViewById(R.id.editText3);
 
@@ -174,7 +209,7 @@ public class MainActivity extends ActionBarActivity implements
       String recipient = recipientText.getText().toString();
       String subject = subjectText.getText().toString();
       String message = "---EasyPGP Message Begin---" + messageEncrypted;
-      new SendEmail(subject, message, "michaelsawyer92@gmail.com", recipient);
+      new SendEmail(subject, message, userEmail, recipient);
       Log.i("Finished sending email...", "");
       Toast.makeText(MainActivity.this, "Email Sent!", Toast.LENGTH_SHORT)
           .show();
@@ -233,9 +268,10 @@ public class MainActivity extends ActionBarActivity implements
       intent.putExtra("com.sawyer.easypgp.PUBLIC_KEY", publicKey.getEncoded());
       startActivity(intent);
 
-//      mTitle = getString(R.string.title_share_key);
-//      Fragment share_key_frag = new ShareKeyFragment();
-//      ft.replace(R.id.container, share_key_frag).addToBackStack(null).commit();
+      // mTitle = getString(R.string.title_share_key);
+      // Fragment share_key_frag = new ShareKeyFragment();
+      // ft.replace(R.id.container,
+      // share_key_frag).addToBackStack(null).commit();
       break;
     }
   }
@@ -271,6 +307,7 @@ public class MainActivity extends ActionBarActivity implements
     // as you specify a parent activity in AndroidManifest.xml.
     int id = item.getItemId();
     if (id == R.id.action_settings) {
+      startActivity(new Intent(this, AppPreferences.class));
       return true;
     } else if (id == R.id.action_example) {
       sendMessage(findViewById(R.layout.activity_main));
@@ -397,7 +434,7 @@ public class MainActivity extends ActionBarActivity implements
     String subject = sender
         + " would like to share his EasyPGP public key with you!";
     String message = publicKey.getEncoded().toString();
-    new SendEmail(subject, message, "michaelsawyer92@gmail.com", recipient);
+    new SendEmail(subject, message, userEmail, recipient);
     Log.i("Finished sending email...", "");
     Toast.makeText(MainActivity.this, "Public Key Sent!", Toast.LENGTH_SHORT)
         .show();
@@ -449,7 +486,7 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     protected Void doInBackground(Void... arg0) {
       try {
-        GmailSender sender = new GmailSender(m_sender, "wogywimdjubybtnk");
+        GmailSender sender = new GmailSender(m_sender, userPassword);
         sender.sendMail(m_subject, m_body, m_sender, m_receiver);
       } catch (Exception e) {
         Log.e("SendMail", e.getMessage(), e);
