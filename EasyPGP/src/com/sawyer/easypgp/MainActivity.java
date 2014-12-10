@@ -401,31 +401,6 @@ public class MainActivity extends ActionBarActivity implements
     Log.i("Finished sending email...", "");
     Toast.makeText(MainActivity.this, "Public Key Sent!", Toast.LENGTH_SHORT)
         .show();
-    /*
-     * // Declare variables; NfcAdapter mNfcAdapter; ObjectInputStream ois =
-     * null; PublicKey publicKey = null; NdefMessage message = null;
-     * 
-     * // Check to see if NFC is available mNfcAdapter =
-     * NfcAdapter.getDefaultAdapter(this); if (mNfcAdapter == null) {
-     * Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
-     * finish(); return; }
-     * 
-     * // Read public key try { FileInputStream file =
-     * this.getApplicationContext().openFileInput( "publicKey"); ois = new
-     * ObjectInputStream(file); publicKey = (PublicKey) ois.readObject();
-     * Log.d("publicKey: ", publicKey.toString()); } catch
-     * (FileNotFoundException e1) { e1.printStackTrace(); } catch
-     * (StreamCorruptedException e) { e.printStackTrace(); } catch (IOException
-     * e) { e.printStackTrace(); } catch (ClassNotFoundException e) {
-     * e.printStackTrace(); }
-     * 
-     * // Create message try { message = new
-     * NdefMessage(publicKey.getEncoded()); } catch (FormatException e) {
-     * e.printStackTrace(); }
-     * 
-     * mNfcAdapter.setNdefPushMessage(message, this, this);
-     */
-
   }
 
   /**

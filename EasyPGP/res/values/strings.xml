@@ -16,6 +16,6 @@
         Checking if NFC is available on your device.
     </string>
     <string name="save_contact">Save Contact!</string>
-    <string name="contact_name">Name&#8230;</string>
+    <string name="contact_name">Email Address&#8230;</string>
 
 </resources>

@@ -1,12 +1,14 @@
 package com.sawyer.easypgp;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Arrays;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -25,7 +27,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +43,7 @@ public class NfcActivity extends ActionBarActivity {
   public static final String MIME_TEXT_PLAIN = "text/plain";
   public static final String MIME_PUBLIC_KEY = "application/pubk.com.sawyer.easypgp";
   public byte[] publicKeyBytes;
+  public PublicKey tmpPubKey;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -116,11 +121,7 @@ public class NfcActivity extends ActionBarActivity {
     /**
      * This method gets called, when a new Intent gets associated with the
      * current activity instance. Instead of creating a new activity,
-     * onNewIntent will be called. For more information have a look at the
-     * documentation.
-     * 
-     * In our case this method gets called, when the user attaches a Tag to the
-     * device.
+     * onNewIntent will be called.
      */
     handleIntent(intent);
   }
@@ -203,28 +204,6 @@ public class NfcActivity extends ActionBarActivity {
     adapter.disableForegroundDispatch(activity);
   }
 
-  private NdefRecord createRecord(String text)
-      throws UnsupportedEncodingException {
-
-    // create the message in according with the standard
-    String lang = "en";
-    byte[] textBytes = text.getBytes();
-    byte[] langBytes = lang.getBytes("US-ASCII");
-    int langLength = langBytes.length;
-    int textLength = textBytes.length;
-
-    byte[] payload = new byte[1 + langLength + textLength];
-    payload[0] = (byte) langLength;
-
-    // copy langbytes and textbytes into payload
-    System.arraycopy(langBytes, 0, payload, 1, langLength);
-    System.arraycopy(textBytes, 0, payload, 1 + langLength, textLength);
-
-    NdefRecord recordNFC = new NdefRecord(NdefRecord.TNF_WELL_KNOWN,
-        NdefRecord.RTD_TEXT, new byte[0], payload);
-    return recordNFC;
-  }
-
   private class NdefWriterTask extends AsyncTask<Tag, Void, String> {
 
     @Override
@@ -237,9 +216,6 @@ public class NfcActivity extends ActionBarActivity {
         return null;
       }
       try {
-        // NdefRecord[] records = { createRecord(publicKeyString) };
-        //
-        // NdefMessage message = new NdefMessage(records);
         NdefMessage msg = new NdefMessage(
             new NdefRecord[] { NdefRecord.createMime(
                 "application/pubk.com.sawyer.easypgp", publicKeyBytes) });
@@ -269,8 +245,6 @@ public class NfcActivity extends ActionBarActivity {
 
   private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
 
-    PublicKey pubkey;
-
     @Override
     protected String doInBackground(Tag... params) {
       Tag tag = params[0];
@@ -286,8 +260,8 @@ public class NfcActivity extends ActionBarActivity {
       NdefRecord[] records = ndefMessage.getRecords();
       for (NdefRecord ndefRecord : records) {
         try {
-          pubkey = readKey(ndefRecord);
-          return pubkey.toString();
+          tmpPubKey = readKey(ndefRecord);
+          return tmpPubKey.toString();
         } catch (UnsupportedEncodingException e) {
           Log.e(TAG, "Unsupported Encoding", e);
         }
@@ -298,14 +272,6 @@ public class NfcActivity extends ActionBarActivity {
 
     private PublicKey readKey(NdefRecord record)
         throws UnsupportedEncodingException {
-      /*
-       * See NFC forum specification for "Text Record Type Definition" at 3.2.1
-       * 
-       * http://www.nfc-forum.org/specs/
-       * 
-       * bit_7 defines encoding bit_6 reserved for future use, must be 0
-       * bit_5..0 length of IANA language code
-       */
 
       byte[] payload = record.getPayload();
 
@@ -327,8 +293,34 @@ public class NfcActivity extends ActionBarActivity {
     @Override
     protected void onPostExecute(String result) {
       if (result != null) {
-        mTextView.setText("Public Key: " + result);
+        mTextView.setText("Public Key: " + tmpPubKey.toString());
       }
+    }
+  }
+
+  private boolean storePublicKey(String name, PublicKey pk) {
+    ObjectOutputStream oos = null;
+    File file = getBaseContext().getFileStreamPath(name);
+    if (!file.exists()) {
+      try {
+        FileOutputStream filePublic = openFileOutput(name, Context.MODE_PRIVATE);
+        oos = new ObjectOutputStream(filePublic);
+        oos.writeObject(pk);
+        return true;
+      } catch (Exception e) {
+        Log.e(TAG, "Error writing contact's public key.");
+      }
+    }
+    return false;
+  }
+
+  public void onClickSave(View view) {
+    EditText contactName = (EditText) findViewById(R.id.contactName);
+    if (storePublicKey(contactName.getText().toString(), tmpPubKey)) {
+      Toast.makeText(this, "Saved Contact", Toast.LENGTH_LONG).show();
+    } else {
+      Toast.makeText(this, "Failed to save contact.", Toast.LENGTH_LONG).show();
+
     }
   }
 }
