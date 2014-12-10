@@ -21,8 +21,10 @@ public class SingleEmailFragment extends Fragment {
 
 		Bundle bundle = this.getArguments();
 		String message = bundle.getString("message", "Empty Message");
+		String author = bundle.getString("author", "N/A");
 		TextView tv = (TextView) view.findViewById(R.id.encryptedEmail);
 		tv.setText(message);
+		getActivity().getActionBar().setTitle(author);
 		return view;
 	}
 }

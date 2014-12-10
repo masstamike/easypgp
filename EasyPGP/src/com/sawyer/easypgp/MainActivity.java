@@ -129,6 +129,7 @@ public class MainActivity extends ActionBarActivity implements
     if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
       processIntent(getIntent());
     }
+    getActionBar().setTitle(R.string.title_compose);
   }
 
   @Override
@@ -406,41 +407,6 @@ public class MainActivity extends ActionBarActivity implements
     findViewById(R.id.decodeButton).setEnabled(false);
   }
 
-  // Runs when click send key button on ShareKey fragment.
-  // TODO: Move to separate class
-  public void onClickSendKey(View view) {
-
-    ObjectInputStream ois = null;
-    PublicKey publicKey = null;
-
-    try {
-      FileInputStream file = this.getApplicationContext().openFileInput(
-          "publicKey");
-      ois = new ObjectInputStream(file);
-      publicKey = (PublicKey) ois.readObject();
-      Log.d("publicKey: ", publicKey.toString());
-    } catch (FileNotFoundException e1) {
-      e1.printStackTrace();
-    } catch (StreamCorruptedException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-    }
-
-    EditText recipientText = (EditText) findViewById(R.id.editText1);
-    String recipient = recipientText.getText().toString();
-    EditText senderText = (EditText) findViewById(R.id.editText2);
-    String sender = senderText.getText().toString();
-    String subject = sender
-        + " would like to share his EasyPGP public key with you!";
-    String message = publicKey.getEncoded().toString();
-    new SendEmail(subject, message, userEmail, recipient);
-    Log.i("Finished sending email...", "");
-    Toast.makeText(MainActivity.this, "Public Key Sent!", Toast.LENGTH_SHORT)
-        .show();
-  }
 
   /**
    * Parses the NDEF Message from the intent

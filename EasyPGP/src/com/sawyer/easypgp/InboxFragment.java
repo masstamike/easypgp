@@ -224,6 +224,7 @@ public class InboxFragment extends Fragment {
             Fragment frag = new SingleEmailFragment();
             Bundle bundle = new Bundle();
             bundle.putString("message", bodies[position]);
+            bundle.putString("author", senders[position]);
             frag.setArguments(bundle);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.container, frag).addToBackStack(null).commit();
@@ -262,6 +263,8 @@ public class InboxFragment extends Fragment {
   @Override
   public void onResume() {
     super.onResume();
+    //Set title
+    getActivity().getActionBar().setTitle(R.string.title_inbox);
     // String[] emailList = {};
     //
     // try {
