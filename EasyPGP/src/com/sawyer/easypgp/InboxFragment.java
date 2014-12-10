@@ -6,9 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.StreamCorruptedException;
-import java.util.ArrayList;
 import java.util.Properties;
 
 import javax.mail.Folder;
@@ -21,8 +18,10 @@ import javax.mail.Store;
 import javax.mail.internet.InternetAddress;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -31,10 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.sawyer.adapters.EmailArrayAdapter;
 
@@ -156,6 +152,11 @@ public class InboxFragment extends Fragment {
 
     @Override
     protected Message[] doInBackground(Void... arg0) {
+      SharedPreferences sharedPrefs = PreferenceManager
+          .getDefaultSharedPreferences(getActivity());
+      String userEmail = sharedPrefs.getString("email", "");
+      String userPassword = sharedPrefs.getString("password", "");
+
       Properties props = System.getProperties();
       props.setProperty("mail.store.protocol", "imaps");
       props.setProperty("mail.imaps.host", "imaps.gmail.com");
@@ -175,8 +176,8 @@ public class InboxFragment extends Fragment {
 
         store = session.getStore("imaps");
 
-        store.connect("imap.gmail.com", "michaelsawyer92@gmail.com",
-            "wogywimdjubybtnk");
+        store.connect("imap.gmail.com", userEmail,
+            userPassword);
 
         inbox = store.getFolder("inbox");
         inbox.open(Folder.READ_ONLY);
@@ -261,28 +262,28 @@ public class InboxFragment extends Fragment {
     super.onResume();
     String[] emailList = {};
 
-    try {
-      getActivity().openFileInput("emailList");
-      Log.d("EasyPGP", "Before ObjectInputStream");
-      ObjectInputStream ois = new ObjectInputStream(getActivity()
-          .openFileInput("emailList"));
-      Log.d("EasyPGP", "After ObjectInputStream");
-      emailList = (String[]) ois.readObject();
-      Log.d("Email Inbox", "Email inbox cached contains:");
-      for (int i = 0; i < emailList.length; i++) {
-        Log.d("Email Inbox", emailList[i]);
-      }
-    } catch (StreamCorruptedException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    // new FileInputStream(getActivity().openFileInput("EmailList"));
-    catch (ClassNotFoundException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+//    try {
+//      getActivity().openFileInput("emailList");
+//      Log.d("EasyPGP", "Before ObjectInputStream");
+//      ObjectInputStream ois = new ObjectInputStream(getActivity()
+//          .openFileInput("emailList"));
+//      Log.d("EasyPGP", "After ObjectInputStream");
+//      emailList = (String[]) ois.readObject();
+//      Log.d("Email Inbox", "Email inbox cached contains:");
+//      for (int i = 0; i < emailList.length; i++) {
+//        Log.d("Email Inbox", emailList[i]);
+//      }
+//    } catch (StreamCorruptedException e) {
+//      // TODO Auto-generated catch block
+//      e.printStackTrace();
+//    } catch (IOException e) {
+//      // TODO Auto-generated catch block
+//      e.printStackTrace();
+//    }
+//    // new FileInputStream(getActivity().openFileInput("EmailList"));
+//    catch (ClassNotFoundException e) {
+//      // TODO Auto-generated catch block
+//      e.printStackTrace();
+//    }
   }
 }
