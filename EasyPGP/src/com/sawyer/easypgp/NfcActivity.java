@@ -302,7 +302,7 @@ public class NfcActivity extends ActionBarActivity {
   private boolean storePublicKey(String name, PublicKey pk) {
     ObjectOutputStream oos = null;
     File file = getBaseContext().getFileStreamPath(name);
-    if (!file.exists()) {
+//    if (!file.exists()) {
       try {
         FileOutputStream filePublic = openFileOutput(name, Context.MODE_PRIVATE);
         oos = new ObjectOutputStream(filePublic);
@@ -311,7 +311,7 @@ public class NfcActivity extends ActionBarActivity {
       } catch (Exception e) {
         Log.e(TAG, "Error writing contact's public key.");
       }
-    }
+//    }
     return false;
   }
 
