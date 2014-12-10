@@ -184,6 +184,7 @@ public class NfcActivity extends ActionBarActivity {
     filters[0].addCategory(Intent.CATEGORY_DEFAULT);
     try {
       filters[0].addDataType(MIME_PUBLIC_KEY);
+      filters[0].addDataType(MIME_TEXT_PLAIN);
     } catch (MalformedMimeTypeException e) {
       throw new RuntimeException("Check your mime type.");
     }

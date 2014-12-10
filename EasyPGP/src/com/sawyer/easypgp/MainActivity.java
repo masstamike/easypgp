@@ -83,6 +83,8 @@ public class MainActivity extends ActionBarActivity implements
         .getDefaultSharedPreferences(this);
     userEmail = sharedPrefs.getString("email", "");
     userPassword = sharedPrefs.getString("password", "");
+    Log.d("Shared Prefs", "Email = " + userEmail);
+    Log.d("Shared Prefs", "Password = " + userPassword);
 
     ObjectOutputStream oos = null;
     File file = getBaseContext().getFileStreamPath("publicKey");
